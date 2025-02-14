@@ -34,7 +34,7 @@ passport.serializeUser((user, done) => {
   done(null, {
     id: user.user_id,
     auth_provider: user.auth_provider,
-    kakao_id: user.kakao_id || null,
+    kakao_access_token: user.kakao_access_token || null,
   });
 });
 
@@ -44,9 +44,11 @@ passport.deserializeUser(async (data, done) => {
     if (!user) return done(null, false);
 
     user.auth_provider = data.auth_provider;
-    user.kakao_id = data.kakao_id;
+    user.kakao_access_token = data.kakao_access_token;
     done(null, user);
   } catch (err) {
     done(err);
   }
 });
+
+module.exports = passport;
