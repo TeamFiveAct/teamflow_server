@@ -35,6 +35,11 @@ const Todo = sequelize.define(
       type: DataTypes.DATEONLY,
       allowNull: true,
     },
+    status: {
+      type: DataTypes.ENUM("plan", "progress", "done"),
+      allowNull: false,
+      defaultValue: "plan",
+    },
     created_at: {
       type: DataTypes.DATE,
       allowNull: false,
