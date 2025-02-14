@@ -12,29 +12,33 @@ const User = sequelize.define(
     },
     email: {
       type: DataTypes.STRING(100),
-      allowNull: false,
+      allowNull: true,
       unique: true,
     },
     password_hash: {
       type: DataTypes.STRING(255),
-      allowNull: false,
+      allowNull: true,
     },
     salt: {
       type: DataTypes.STRING(255),
-      allowNull: false,
+      allowNull: true,
     },
     nickname: {
       type: DataTypes.STRING(50),
-      allowNull: false,
+      allowNull: true,
     },
     profile_image: {
       type: DataTypes.STRING(255),
       allowNull: true,
     },
-    auth_type: {
+    auth_provider: {
       type: DataTypes.ENUM("email", "kakao"),
       allowNull: false,
       defaultValue: "email",
+    },
+    kako_id: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
     },
     created_at: {
       type: DataTypes.DATE,

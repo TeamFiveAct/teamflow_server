@@ -16,7 +16,7 @@ const Worker = sequelize.define(
     },
     mem_id: {
       type: DataTypes.BIGINT,
-      allowNull: false, // FK (workspace_members.mem_id)
+      allowNull: true, // FK (workspace_members.mem_id)
     },
   },
   {
