@@ -51,7 +51,7 @@ exports.postJoin = async (req, res) => {
   }
 };
 
-// 닉네임 중복 확인 GET /v1/user/check-name
+// 닉네임 중복 확인 GET /v1/user/check-name/:nickname
 exports.getCheckName = async (req, res) => {
   try {
     const { nickname } = req.query;
@@ -66,6 +66,33 @@ exports.getCheckName = async (req, res) => {
     return res.send({
       status: 'SUCCESS',
       message: '사용가능한 닉네임입니다.',
+      data: null,
+    });
+  } catch (err) {
+    console.log('error', err);
+    return res.send({
+      status: 'ERROR',
+      message: '서버 오류가 발생했습니다.',
+      data: null,
+    });
+  }
+};
+
+// 이메일 중복 확인 GET /v1/user/check-email/:email
+exports.getCheckEmail = async (req, res) => {
+  try {
+    const { email } = req.query;
+    const existEmail = await User.findOne({ where: { email } });
+    if (existEmail) {
+      return res.send({
+        status: 'ERROR',
+        message: '중복된 이메일이 존재합니다.',
+        data: null,
+      });
+    }
+    return res.send({
+      statue: 'SUCCESS',
+      message: '사용가능한 이메일입니다.',
       data: null,
     });
   } catch (err) {

@@ -20,7 +20,7 @@ app.get('/', (req, res) => {
 });
 
 // 라우터 연결
-app.use('/', userRouter);
+app.use('/v1/user', userRouter);
 app.use('/workspace', workspaceRouter);
 app.use('/todos', todosRouter);
 
