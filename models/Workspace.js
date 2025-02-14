@@ -14,11 +14,15 @@ const Workspace = sequelize.define(
       type: DataTypes.STRING(255),
       allowNull: false,
     },
-    space_password: {
+    space_description: {
       type: DataTypes.STRING(255),
       allowNull: true,
     },
-    created_id: {
+    space_password: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+    },
+    user_id: {
       type: DataTypes.BIGINT,
       allowNull: false, // FK (users.user_id)
     },
