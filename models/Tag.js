@@ -5,23 +5,14 @@ const sequelize = require("../config/database"); // 경로 수정
 const Tag = sequelize.define(
   "Tag",
   {
-    id: {
+    tag_id: {
       type: DataTypes.BIGINT,
       primaryKey: true,
       autoIncrement: true,
     },
-    workspace_id: {
-      type: DataTypes.BIGINT,
-      allowNull: false, // FK (workspaces.space_id)
-    },
-    name: {
-      type: DataTypes.STRING(50),
+    tag_name: {
+      type: DataTypes.STRING(100),
       allowNull: false,
-    },
-    is_global: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
     },
   },
   {
