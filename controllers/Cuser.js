@@ -8,6 +8,7 @@ exports.join = (req, res) => {
   res.send({ msg: 'user' });
 };
 
+// 회원가입 POST /api/user/join
 exports.postJoin = async (req, res) => {
   try {
     const { email, password_hash, nickname } = req.body;
@@ -39,6 +40,33 @@ exports.postJoin = async (req, res) => {
       status: 'SUCCESS',
       message: '회원가입이 성공되었습니다.',
       data: { nickname: newUser.nickname },
+    });
+  } catch (err) {
+    console.log('error', err);
+    return res.send({
+      status: 'ERROR',
+      message: '서버 오류가 발생했습니다.',
+      data: null,
+    });
+  }
+};
+
+// 닉네임 중복 확인 GET /v1/user/check-name
+exports.getCheckName = async (req, res) => {
+  try {
+    const { nickname } = req.query;
+    const existName = await User.findOne({ where: { nickname } });
+    if (existName) {
+      return res.send({
+        status: 'ERROR',
+        message: '중복된 닉네임이 존재합니다.',
+        data: null,
+      });
+    }
+    return res.send({
+      status: 'SUCCESS',
+      message: '사용가능한 닉네임입니다.',
+      data: null,
     });
   } catch (err) {
     console.log('error', err);
