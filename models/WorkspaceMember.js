@@ -20,7 +20,7 @@ const WorkspaceMember = sequelize.define(
     },
   },
   {
-    tableName: "workspace_members",
+    tableName: "workspace_member",
     timestamps: false,
   }
 );
