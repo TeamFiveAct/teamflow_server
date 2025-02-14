@@ -3,11 +3,6 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
 
-exports.join = (req, res) => {
-  console.log('user! join 컨트롤러!');
-  res.send({ msg: 'user' });
-};
-
 // 회원가입 POST /api/user/join
 exports.postJoin = async (req, res) => {
   try {
@@ -51,7 +46,7 @@ exports.postJoin = async (req, res) => {
   }
 };
 
-// 닉네임 중복 확인 GET /v1/user/check-name/:nickname
+// 닉네임 중복 확인 GET /v1/user/check-name
 exports.getCheckName = async (req, res) => {
   try {
     const { nickname } = req.query;
@@ -78,7 +73,7 @@ exports.getCheckName = async (req, res) => {
   }
 };
 
-// 이메일 중복 확인 GET /v1/user/check-email/:email
+// 이메일 중복 확인 GET /v1/user/check-email
 exports.getCheckEmail = async (req, res) => {
   try {
     const { email } = req.query;
