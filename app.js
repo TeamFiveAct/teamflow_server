@@ -6,6 +6,11 @@ const userRouter = require("./routes/user");
 const workspaceRouter = require("./routes/workspace");
 const todosRouter = require("./routes/todos");
 
+// 라우터 로드
+const userRouter = require("./routes/user");
+const workspaceRouter = require("./routes/workspace");
+const todosRouter = require("./routes/todos");
+
 const app = express();
 const PORT = 8000;
 
