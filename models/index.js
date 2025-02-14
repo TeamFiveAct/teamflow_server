@@ -1,3 +1,5 @@
+const { Sequelize, DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 // models/index.js
 const User = require('./User');
 const Workspace = require('./Workspace');
@@ -7,7 +9,7 @@ const Message = require('./Message');
 const Todo = require('./Todo');
 const Worker = require('./Worker');
 const Tag = require('./Tag');
-const TodoTag = require('./TodoTags');
+const TodoTags = require('./TodoTags');
 
 // ─────────────────────────────────────────────────────────
 // 1) User ↔ Workspace (1 : 1)
@@ -101,10 +103,18 @@ Tag.belongsToMany(Todo, {
   as: 'Todos',
 });
 
+// console.log('DB_NAME:', process.env.DB_NAME);
+// console.log('DB_USER:', process.env.DB_USER);
+// console.log('DB_PASSWORD:', process.env.DB_PASSWORD ? '********' : 'Not Set');
+// console.log('DB_HOST:', process.env.DB_HOST);
+// console.log('DB_PORT:', process.env.DB_PORT);
+// console.log('DB_DIALECT:', process.env.DB_DIALECT);
+
 /**
  * 데이터베이스 동기화
  */
-sequelize.sync({ force: false }).then(() => {
+// 테이블 만들기 위해서는 false로 하고 테이블 만들면 true로 바꿔주기
+sequelize.sync({ force: true }).then(() => {
   console.log('Database synced!');
 });
 

@@ -1,25 +1,28 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
+
+const Todo = require('./Todo');
+const Tag = require('./Tag');
 
 const TodoTag = sequelize.define(
-  "TodoTag",
+  'TodoTag',
   {
     todo_id: {
       type: DataTypes.INTEGER,
-      references: { model: Todo, key: "todo_id" },
-      onDelete: "CASCADE",
+      references: { model: Todo, key: 'todo_id' },
+      onDelete: 'CASCADE',
       primaryKey: true,
     },
     tag_id: {
       type: DataTypes.INTEGER,
-      references: { model: Tag, key: "tag_id" },
-      onDelete: "CASCADE",
+      references: { model: Tag, key: 'tag_id' },
+      onDelete: 'CASCADE',
       primaryKey: true,
     },
   },
   {
-    tableName: "TodoTags",
+    tableName: 'TodoTags',
     timestamps: false,
   }
 );
-module.exports = TodoTags;
+module.exports = TodoTag;
