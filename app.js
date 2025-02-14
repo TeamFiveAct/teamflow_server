@@ -1,10 +1,11 @@
 const express = require('express');
+const session = require('express-session');
 const db = require('./models'); // index.js에서 export 한 모든 모델
 
 // 라우터 로드
-const userRouter = require("./routes/user");
-const workspaceRouter = require("./routes/workspace");
-const todosRouter = require("./routes/todos");
+const userRouter = require('./routes/user');
+const workspaceRouter = require('./routes/workspace');
+const todosRouter = require('./routes/todos');
 
 const app = express();
 const PORT = 8000;
@@ -19,9 +20,9 @@ app.get('/', (req, res) => {
 });
 
 // 라우터 연결
-app.use("/user", userRouter);
-app.use("/workspace", workspaceRouter);
-app.use("/todos", todosRouter);
+app.use('/', userRouter);
+app.use('/workspace', workspaceRouter);
+app.use('/todos', todosRouter);
 
 // 404 처리 미들웨어
 app.use((req, res) => {
