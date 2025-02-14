@@ -14,6 +14,10 @@ const ChatRoom = sequelize.define(
       type: DataTypes.BIGINT,
       allowNull: false, // FK (workspaces.space_id)
     },
+    user_id: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+    },
   },
   {
     tableName: "chat_rooms",
