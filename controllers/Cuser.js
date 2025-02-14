@@ -2,6 +2,7 @@ const db = require('../models');
 const express = require('express');
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
+const passport = require('passport');
 
 // 회원가입 POST /api/user/join
 exports.postJoin = async (req, res) => {
@@ -98,4 +99,27 @@ exports.getCheckEmail = async (req, res) => {
       data: null,
     });
   }
+};
+
+// 이메일 기반 로그인 POST /v1/user/login
+exports.postLogin = (req, res, next) => {
+  passport.authenticate('local', (err, user, info) => {
+    if (err) return next(err);
+    if (!user) {
+      return res.send({
+        status: 'ERROR',
+        message: info.message || '로그인 실패했습니다.',
+        data: null,
+      });
+    }
+
+    req.login(user, (loginInErr) => {
+      if (loginInErr) return next(loginInErr);
+      return res.send({
+        status: 'SUCCESS',
+        message: '로그인 성공했습니다.',
+        data: { nickname: user.nickname },
+      });
+    });
+  })(req, res, next);
 };

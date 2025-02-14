@@ -11,4 +11,7 @@ router.get('/check-name', controller.getCheckName);
 // 이메일 중복 확인
 router.get('/check-email', controller.getCheckEmail);
 
+// 이메일 기반 로그인
+router.post('/login', controller.postLogin);
+
 module.exports = router;

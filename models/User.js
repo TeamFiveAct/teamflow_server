@@ -32,7 +32,7 @@ const User = sequelize.define(
       allowNull: false,
       defaultValue: 'email',
     },
-    kako_id: {
+    kakao_id: {
       type: DataTypes.STRING(255),
       allowNull: true,
     },

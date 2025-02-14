@@ -8,15 +8,14 @@ passport.use(
     {
       usernameField: 'email',
       passwordField: 'password_hash',
+      session: true,
     },
     async (email, password_hash, done) => {
       try {
         const user = await User.findOne({ where: { email } });
         if (!user)
           return done(null, false, {
-            statue: 'ERROR',
             message: '가입된 사용자가 아닙니다.',
-            data: null,
           });
 
         const isMatch = await bcrypt.compare(password_hash, user.password_hash);
@@ -32,7 +31,7 @@ passport.use(
 
 passport.serializeUser((user, done) => {
   done(null, {
-    id: user.user_id,
+    user_id: user.user_id,
     auth_provider: user.auth_provider,
     kakao_access_token: user.kakao_access_token || null,
   });
