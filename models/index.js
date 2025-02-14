@@ -1,155 +1,112 @@
 // models/index.js
-const User = require("./User");
-const Workspace = require("./Workspace");
-const WorkspaceMember = require("./WorkspaceMember");
-const ChatRoom = require("./ChatRoom");
-const Message = require("./Message");
-const Todo = require("./Todo");
-const Worker = require("./Worker");
-const Tag = require("./Tag");
+const User = require('./User');
+const Workspace = require('./Workspace');
+const WorkspaceMember = require('./WorkspaceMember');
+const ChatRoom = require('./ChatRoom');
+const Message = require('./Message');
+const Todo = require('./Todo');
+const Worker = require('./Worker');
+const Tag = require('./Tag');
+const TodoTag = require('./TodoTags');
 
 // ─────────────────────────────────────────────────────────
-// 1) User ↔ Workspace (Many-to-Many) via WorkspaceMember
+// 1) User ↔ Workspace (1 : 1)
 // ─────────────────────────────────────────────────────────
-User.belongsToMany(Workspace, {
-  through: WorkspaceMember,
-  foreignKey: "user_id",
-  otherKey: "space_id",
-  as: "Workspaces",
+User.hasOne(Workspace, {
+  foreignKey: 'user_id',
+  as: 'workspaces',
 });
 
-Workspace.belongsToMany(User, {
-  through: WorkspaceMember,
-  foreignKey: "space_id",
-  otherKey: "user_id",
-  as: "Users",
-});
-
-// ─────────────────────────────────────────────────────────
-// 2) User(creator) ↔ Workspace (1:N)
-//    Workspace.created_id → User.user_id
-// ─────────────────────────────────────────────────────────
 Workspace.belongsTo(User, {
-  foreignKey: "created_id",
-  as: "Creator",
+  foreignKey: 'user_id',
+  as: 'users',
 });
 
 // ─────────────────────────────────────────────────────────
-// 3) WorkspaceMember ↔ Workspace (N:1)
+// 2) WorkspaceMember ↔ Workspace (N:1)
 // ─────────────────────────────────────────────────────────
 WorkspaceMember.belongsTo(Workspace, {
-  foreignKey: "space_id",
-  as: "Workspace",
+  foreignKey: 'space_id',
+  as: 'workspaces',
 });
 Workspace.hasMany(WorkspaceMember, {
-  foreignKey: "space_id",
-  as: "Members",
+  foreignKey: 'space_id',
+  as: 'workspace_member',
 });
 
 // ─────────────────────────────────────────────────────────
-// 4) WorkspaceMember ↔ User (N:1)
-// ─────────────────────────────────────────────────────────
-WorkspaceMember.belongsTo(User, {
-  foreignKey: "user_id",
-  as: "User",
-});
-User.hasMany(WorkspaceMember, {
-  foreignKey: "user_id",
-  as: "WorkspaceMembers",
-});
-
-// ─────────────────────────────────────────────────────────
-// 5) ChatRoom ↔ Workspace (N:1)
+// 3) ChatRoom ↔ Workspace (1:1)
 // ─────────────────────────────────────────────────────────
 ChatRoom.belongsTo(Workspace, {
-  foreignKey: "space_id",
-  as: "Workspace",
+  foreignKey: 'space_id',
+  as: 'workspaces',
 });
-Workspace.hasMany(ChatRoom, {
-  foreignKey: "space_id",
-  as: "ChatRooms",
+Workspace.hasOne(ChatRoom, {
+  foreignKey: 'space_id',
+  as: 'chat_rooms',
 });
 
 // ─────────────────────────────────────────────────────────
-// 6) Message ↔ ChatRoom (N:1)
+// 4) Message ↔ ChatRoom (N:1)
 // ─────────────────────────────────────────────────────────
 Message.belongsTo(ChatRoom, {
-  foreignKey: "room_id",
-  as: "ChatRoom",
+  foreignKey: 'room_id',
+  as: 'ChatRoom',
 });
 ChatRoom.hasMany(Message, {
-  foreignKey: "room_id",
-  as: "Messages",
+  foreignKey: 'room_id',
+  as: 'Messages',
 });
 
 // ─────────────────────────────────────────────────────────
-// 7) Message ↔ WorkspaceMember (N:1)
-//    누가 메시지를 보냈는지
-// ─────────────────────────────────────────────────────────
-Message.belongsTo(WorkspaceMember, {
-  foreignKey: "mem_id",
-  as: "Sender",
-});
-WorkspaceMember.hasMany(Message, {
-  foreignKey: "mem_id",
-  as: "Messages",
-});
-
-// ─────────────────────────────────────────────────────────
-// 8) Todo ↔ Workspace (N:1)
+// 5) Todo ↔ Workspace (N:1)
 // ─────────────────────────────────────────────────────────
 Todo.belongsTo(Workspace, {
-  foreignKey: "space_id",
-  as: "Workspace",
+  foreignKey: 'space_id',
+  as: 'Workspace',
 });
 Workspace.hasMany(Todo, {
-  foreignKey: "space_id",
-  as: "Todos",
+  foreignKey: 'space_id',
+  as: 'Todos',
 });
 
 // ─────────────────────────────────────────────────────────
-// 9) Worker ↔ Todo (N:1)
+// 6) Worker ↔ Todo (N:1)
 //    하나의 Todo에 여러 명이 참여 가능
 // ─────────────────────────────────────────────────────────
 Worker.belongsTo(Todo, {
-  foreignKey: "todo_id",
-  as: "Todo",
+  foreignKey: 'todo_id',
+  as: 'Todo',
 });
 Todo.hasMany(Worker, {
-  foreignKey: "todo_id",
-  as: "Workers",
+  foreignKey: 'todo_id',
+  as: 'Workers',
 });
 
 // ─────────────────────────────────────────────────────────
-// 10) Worker ↔ WorkspaceMember (N:1)
+// 7) Tags ↔ TodoTags ↔ Todo (N:M), 중간 테이블 TodoTags
+//
 // ─────────────────────────────────────────────────────────
-Worker.belongsTo(WorkspaceMember, {
-  foreignKey: "mem_id",
-  as: "Member",
-});
-WorkspaceMember.hasMany(Worker, {
-  foreignKey: "mem_id",
-  as: "WorkList", // 예: 그 멤버가 맡은 Todo 리스트
+Todo.belongsToMany(Tag, {
+  through: TodoTags,
+  foreignKey: 'todo_id',
+  otherKey: 'tag_id',
+  as: 'Tags',
 });
 
-// ─────────────────────────────────────────────────────────
-// 11) Tag ↔ Workspace (N:1)
-// ─────────────────────────────────────────────────────────
-Tag.belongsTo(Workspace, {
-  foreignKey: "workspace_id",
-  as: "Workspace",
-});
-Workspace.hasMany(Tag, {
-  foreignKey: "workspace_id",
-  as: "Tags",
+Tag.belongsToMany(Todo, {
+  through: TodoTags,
+  foreignKey: 'tag_id',
+  otherKey: 'todo_id',
+  as: 'Todos',
 });
 
 /**
- * ※ 만약 Tag와 Todo가 다대다 관계라면 todo_tags 같은 별도 중간 테이블을 만들어서
- *   아래와 같이 belongsToMany를 설정하면 됩니다.
- *   ex) Todo.belongsToMany(Tag, { through: 'todo_tags', foreignKey: 'todo_id', otherKey: 'tag_id' });
- *       Tag.belongsToMany(Todo, { through: 'todo_tags', foreignKey: 'tag_id', otherKey: 'todo_id' });
+ * 데이터베이스 동기화
  */
+sequelize.sync({ force: false }).then(() => {
+  console.log('Database synced!');
+});
 
 // 모든 모델을 모아서 내보내기
 module.exports = {
