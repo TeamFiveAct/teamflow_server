@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const passport = require('passport');
 
+
 // 회원가입 POST /api/user/join
 exports.postJoin = async (req, res) => {
   try {
@@ -116,12 +117,40 @@ exports.postLogin = (req, res, next) => {
     req.login(user, (loginInErr) => {
       if (loginInErr) return next(loginInErr);
 
-      console.log('현재 세션:', req.session);
-      
+      // console.log('현재 세션:', req.session); // 세션 확인
+
       return res.send({
         status: 'SUCCESS',
         message: '로그인 성공했습니다.',
         data: { nickname: user.nickname },
+      });
+    });
+  })(req, res, next);
+};
+
+// 카카오 기반 로그인 GET /v1/user/kakao-login
+exports.getKakaoLogin = passport.authenticate("kakao");
+
+// 클라언트가 호출 할 필요 없이 자동으로 호출됨
+exports.getKakaoCallback = (req, res, next) => {
+  passport.authenticate("kakao", (err, user, info) => {
+    if (err) return next(err);
+    if (!user) {
+      return res.send({statue : "ERROR", messge : "로그인 실패했습니다.", data: null})
+    }
+
+    // 로그인 성공 시 세션 저장
+    req.login(user, (loginErr) => {
+      if (loginErr) return next(loginErr);
+
+      // console.log("세션 확인", req.session); // 세션 확인
+
+      return res.send({
+        status: "SUCCESS",
+        message: "카카오 로그인 성공했습니다.",
+        data: {
+          nickname: user.nickname,
+        },
       });
     });
   })(req, res, next);

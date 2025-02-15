@@ -2,10 +2,10 @@
 - 카카오 로그인하는 passport 미들웨어
 */
 const passport = require("passport");
-const kakoStrategy = require("passport-kakao").Strategy;
+const kakaoStrategy = require("passport-kakao").Strategy;
 const User = require("../models/User");
 
-passport.use(new KakaoStrategy({
+passport.use(new kakaoStrategy({
     clientID: process.env.KAKAO_CLIENT_ID,
     clientSecret: process.env.KAKAO_CLIENT_SECRET,
     callbackURL: process.env.KAKAO_CALLBACK_URL
@@ -16,7 +16,6 @@ passport.use(new KakaoStrategy({
             user = await User.create({
                 auth_provider: 'kakao',
                 kakao_id: profile.id,
-                nickname: profile.username
             });
         }
         return done(null, user);
@@ -24,6 +23,5 @@ passport.use(new KakaoStrategy({
         return done(error);
     }
 }));
-
 
 module.exports = passport;

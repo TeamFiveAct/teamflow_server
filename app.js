@@ -1,6 +1,7 @@
 const express = require('express');
 const session = require('express-session');
 const passport = require('./config/passport');
+
 const db = require('./models'); // index.js에서 export 한 모든 모델
 
 // 라우터 로드
@@ -21,6 +22,9 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    cookie : {
+      maxAge : 4 * 60 * 60 * 1000, // 세션 임시 4시간으로 설정
+    }
   })
 );
 app.use(passport.initialize());
