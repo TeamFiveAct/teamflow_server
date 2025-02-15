@@ -33,7 +33,6 @@ passport.serializeUser((user, done) => {
   done(null, {
     user_id: user.user_id,
     auth_provider: user.auth_provider,
-    kakao_access_token: user.kakao_access_token || null,
   });
 });
 
