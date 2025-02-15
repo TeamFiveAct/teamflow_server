@@ -1,3 +1,6 @@
 /node_modules
-/swagger
 .env
+.teamflow.sql
+/swagger
+
+
