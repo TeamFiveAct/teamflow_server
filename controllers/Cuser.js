@@ -115,6 +115,9 @@ exports.postLogin = (req, res, next) => {
 
     req.login(user, (loginInErr) => {
       if (loginInErr) return next(loginInErr);
+
+      console.log('현재 세션:', req.session);
+      
       return res.send({
         status: 'SUCCESS',
         message: '로그인 성공했습니다.',

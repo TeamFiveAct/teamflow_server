@@ -1,3 +1,7 @@
+/*
+- 로컬에서 로그인하는 passport 미들웨어
+*/
+
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt');
