@@ -38,7 +38,7 @@ app.get('/', (req, res) => {
 // 라우터 연결
 app.use('/v1/user', userRouter);
 app.use("/v1/workspace", workspaceRouter);
-app.use("/v1/todos", todosRouter);
+app.use("/v1/workspace/:space_id/todos", todosRouter);
 
 
 // 404 처리 미들웨어
