@@ -1,9 +1,9 @@
 // models/User.js
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database"); // 경로 수정
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database'); // 경로 수정
 
 const User = sequelize.define(
-  "User",
+  'User',
   {
     user_id: {
       type: DataTypes.BIGINT,
@@ -19,10 +19,6 @@ const User = sequelize.define(
       type: DataTypes.STRING(255),
       allowNull: true,
     },
-    salt: {
-      type: DataTypes.STRING(255),
-      allowNull: true,
-    },
     nickname: {
       type: DataTypes.STRING(50),
       allowNull: true,
@@ -32,11 +28,11 @@ const User = sequelize.define(
       allowNull: true,
     },
     auth_provider: {
-      type: DataTypes.ENUM("email", "kakao"),
+      type: DataTypes.ENUM('email', 'kakao'),
       allowNull: false,
-      defaultValue: "email",
+      defaultValue: 'email',
     },
-    kako_id: {
+    kakao_id: {
       type: DataTypes.STRING(255),
       allowNull: true,
     },
@@ -47,7 +43,7 @@ const User = sequelize.define(
     },
   },
   {
-    tableName: "users",
+    tableName: 'users',
     timestamps: false, // created_at 등을 직접 다룬다면 true일 필요가 없을 수 있습니다.
   }
 );

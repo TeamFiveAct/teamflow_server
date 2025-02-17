@@ -113,8 +113,8 @@ Tag.belongsToMany(Todo, {
 /**
  * 데이터베이스 동기화
  */
-// 테이블 만들기 위해서는 false로 하고 테이블 만들면 true로 바꿔주기
-sequelize.sync({ force: true }).then(() => {
+// 테이블 만들기 위해서는 true로 하고 테이블 만들면 false로 바꿔주기
+sequelize.sync({ force: false }).then(() => {
   console.log('Database synced!');
 });
 

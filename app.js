@@ -4,6 +4,8 @@ const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
 const { Server } = require('socket.io');
+const session = require('express-session');
+const passport = require('./config/passport');
 
 const db = require('./models'); // index.js에서 export 한 모든 모델
 
@@ -11,15 +13,30 @@ const db = require('./models'); // index.js에서 export 한 모든 모델
 const userRouter = require('./routes/user');
 const workspaceRouter = require('./routes/workspace');
 const todosRouter = require('./routes/todos');
-const uploadRouter = require('./routes/upload'); // 파일 업로드 라우터 (아래 분리 파일 참고)
-const chatSocket = require('./sockets/chat'); // Socket.io 이벤트 핸들러 (아래 분리 파일 참고)
+const uploadRouter = require('./routes/upload'); // 파일 업로드 라우터
+const chatSocket = require('./sockets/chat'); // Socket.io 이벤트 핸들러
 
 const app = express();
+require('dotenv').config();
 const PORT = process.env.PORT || 8000;
 
 // JSON 요청 및 URL 인코딩된 요청 처리
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// 세션 및 Passport 설정
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      maxAge: 4 * 60 * 60 * 1000, // 세션 임시 4시간으로 설정
+    },
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
 
 // 업로드 폴더 생성 및 정적 파일 서빙
 const uploadDir = path.join(__dirname, 'uploads');
@@ -33,10 +50,10 @@ app.get('/', (req, res) => {
   res.json({ msg: 'Index' });
 });
 
-// 각 기능별 라우터 연결
-app.use('/user', userRouter);
-app.use('/workspace', workspaceRouter);
-app.use('/todos', todosRouter);
+// 라우터 연결 (필요에 따라 경로 조정)
+app.use('/v1/user', userRouter);
+app.use('/v1/workspace', workspaceRouter);
+app.use('/v1/workspace/:space_id/todos', todosRouter);
 app.use('/upload', uploadRouter);
 
 // 404 처리 미들웨어
