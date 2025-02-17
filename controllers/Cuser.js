@@ -4,11 +4,17 @@ const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const passport = require('passport');
 
+exports.getTest = (req, res) => {
+  res.send({ message: 'test' });
+};
 
 // 회원가입 POST /api/user/join
 exports.postJoin = async (req, res) => {
   try {
     const { email, password_hash, nickname } = req.body;
+    console.log(email);
+    console.log(password_hash);
+    console.log(nickname);
     if (!email || !password_hash || !nickname) {
       return res.send({
         status: 'ERROR',
@@ -129,14 +135,18 @@ exports.postLogin = (req, res, next) => {
 };
 
 // 카카오 기반 로그인 GET /v1/user/kakao-login
-exports.getKakaoLogin = passport.authenticate("kakao");
+exports.getKakaoLogin = passport.authenticate('kakao');
 
 // 클라언트가 호출 할 필요 없이 자동으로 호출됨
 exports.getKakaoCallback = (req, res, next) => {
-  passport.authenticate("kakao", (err, user, info) => {
+  passport.authenticate('kakao', (err, user, info) => {
     if (err) return next(err);
     if (!user) {
-      return res.send({statue : "ERROR", messge : "로그인 실패했습니다.", data: null})
+      return res.send({
+        statue: 'ERROR',
+        messge: '로그인 실패했습니다.',
+        data: null,
+      });
     }
 
     // 로그인 성공 시 세션 저장
@@ -146,8 +156,8 @@ exports.getKakaoCallback = (req, res, next) => {
       // console.log("세션 확인", req.session); // 세션 확인
 
       return res.send({
-        status: "SUCCESS",
-        message: "카카오 로그인 성공했습니다.",
+        status: 'SUCCESS',
+        message: '카카오 로그인 성공했습니다.',
         data: {
           nickname: user.nickname,
         },

@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/Cuser');
 
+// test
+router.get('/test', controller.getTest);
+
 // 회원가입
 router.post('/join', controller.postJoin);
 
@@ -18,6 +21,6 @@ router.post('/login', controller.postLogin);
 router.get('/kakao-login', controller.getKakaoLogin);
 
 // 카카오 로그인 콜백 함수 (카카오 로그인 성공/실패시) - 클라이언트에서 호출해줄필요없이 리다이렉트 됨
-router.get("/kakao/callback", controller.getKakaoCallback)
+router.get('/kakao/callback', controller.getKakaoCallback);
 
 module.exports = router;

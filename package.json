@@ -4,8 +4,9 @@
   "description": "이 프로젝트는 **Git Flow** 전략을 따르며, 브랜치는 다음과 같이 운영됩니다!",
   "main": "index.js",
   "scripts": {
-    "start": "node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "cross-env NODE_ENV=production pm2 start app.js",
+    "dev": "cross-env NODE_ENV=development nodemon app"
   },
   "repository": {
     "type": "git",
