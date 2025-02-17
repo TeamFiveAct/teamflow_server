@@ -6,6 +6,9 @@ const multer = require('multer');
 const { Server } = require('socket.io');
 const session = require('express-session');
 const passport = require('./config/passport');
+//const env = 'production';
+const env = 'development';
+const config = require('./config/config.json')[env];
 
 const db = require('./models'); // index.js에서 export 한 모든 모델
 
@@ -18,7 +21,7 @@ const chatSocket = require('./sockets/chat'); // Socket.io 이벤트 핸들러
 
 const app = express();
 require('dotenv').config();
-const PORT = process.env.PORT || 8000;
+const PORT = 8000;
 
 // JSON 요청 및 URL 인코딩된 요청 처리
 app.use(express.json());
@@ -27,7 +30,7 @@ app.use(express.urlencoded({ extended: true }));
 // 세션 및 Passport 설정
 app.use(
   session({
-    secret: process.env.SESSION_SECRET,
+    secret: config.sessionSecret,
     resave: false,
     saveUninitialized: false,
     cookie: {
