@@ -1,6 +1,6 @@
+// models/index.js
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-// models/index.js
 const User = require('./User');
 const Workspace = require('./Workspace');
 const WorkspaceMember = require('./WorkspaceMember');

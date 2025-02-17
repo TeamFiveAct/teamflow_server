@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/TeamFiveAct/teamflow_server#readme",
   "dependencies": {
+    "@faker-js/faker": "^9.5.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "ejs": "^3.1.10",
