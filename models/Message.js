@@ -1,9 +1,9 @@
 // models/Message.js
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database"); // 경로 수정
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database'); // 경로 수정
 
 const Message = sequelize.define(
-  "Message",
+  'Message',
   {
     chat_id: {
       type: DataTypes.BIGINT,
@@ -23,9 +23,9 @@ const Message = sequelize.define(
       allowNull: true,
     },
     content_type: {
-      type: DataTypes.ENUM("text", "image", "video", "file"),
+      type: DataTypes.ENUM('text', 'image', 'video', 'file'),
       allowNull: false,
-      defaultValue: "text",
+      defaultValue: 'text',
     },
     created_at: {
       type: DataTypes.DATE,
@@ -34,7 +34,7 @@ const Message = sequelize.define(
     },
   },
   {
-    tableName: "messages",
+    tableName: 'messages',
     timestamps: false,
   }
 );
