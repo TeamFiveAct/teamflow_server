@@ -31,9 +31,12 @@ exports.postTodoList = async (req, res) => {
 // 특정 업무 조회
 exports.postTodo = async (req, res) => {
   try {
-    console.log(req.params);
+    const { space_id, todo_id } = req.params;
     const todo = await todoModel.findOne({
-      where: { todo_id: req.params.todo_id, space_id: req.body.space_id },
+      where: {
+        space_id: space_id,
+        todo_id: todo_id
+      },
     });
 
     res.json({
