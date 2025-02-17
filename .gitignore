@@ -2,5 +2,7 @@
 .env
 .teamflow.sql
 /swagger
+.api.http
+/config/config.json
 
 
