@@ -12,13 +12,6 @@ const config = require('./config/config.json')[env];
 
 const db = require('./models'); // index.js에서 export 한 모든 모델
 
-// 라우터 로드
-const userRouter = require('./routes/user');
-const workspaceRouter = require('./routes/workspace');
-const todosRouter = require('./routes/todos');
-const uploadRouter = require('./routes/upload'); // 파일 업로드 라우터
-const chatSocket = require('./sockets/chat'); // Socket.io 이벤트 핸들러
-
 const app = express();
 require('dotenv').config();
 const PORT = 8000;
@@ -35,11 +28,25 @@ app.use(
     saveUninitialized: false,
     cookie: {
       maxAge: 4 * 60 * 60 * 1000, // 세션 임시 4시간으로 설정
+      secure : false,
+      httpOnly : true
     },
   })
 );
+
+
 app.use(passport.initialize());
 app.use(passport.session());
+
+
+// 라우터 로드
+const userRouter = require('./routes/user');
+const workspaceRouter = require('./routes/workspace');
+const todosRouter = require('./routes/todos');
+const uploadRouter = require('./routes/upload'); // 파일 업로드 라우터
+const chatSocket = require('./sockets/chat'); // Socket.io 이벤트 핸들러
+
+
 
 // 업로드 폴더 생성 및 정적 파일 서빙
 const uploadDir = path.join(__dirname, 'uploads');

@@ -36,6 +36,14 @@ const User = sequelize.define(
       type: DataTypes.STRING(255),
       allowNull: true,
     },
+    access_token: {
+      type: DataTypes.STRING(500),
+      allowNull: true,
+    },
+    refresh_token: {
+      type: DataTypes.STRING(500),
+      allowNull: true,
+    },
     created_at: {
       type: DataTypes.DATE,
       allowNull: false,
