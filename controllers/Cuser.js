@@ -3,6 +3,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const passport = require('passport');
+const axios = require('axios');
 
 exports.getTest = (req, res) => {
   res.send({ message: 'test' });
@@ -190,8 +191,7 @@ exports.postLogout = (req, res) => {
   });
 };
 
-const axios = require('axios');
-
+// 카카오 로그아웃 POST /v1/user/kakao-logout
 exports.postKakaoLogout = async (req, res, next) => {
   console.log('로그아웃 전 세션 확인', req.session);
   try {
@@ -236,7 +236,6 @@ exports.postKakaoLogout = async (req, res, next) => {
       });
     });
   } catch (err) {
-    console.log("🚨 카카오 로그아웃 오류:", err);
     return res.send({
       status: 'ERROR',
       message: '카카오 로그아웃 실패했습니다.',
@@ -245,6 +244,7 @@ exports.postKakaoLogout = async (req, res, next) => {
   }
 };
 
+// 현재 로그인한 사용자 세션 확인 GET /v1/user/session
 exports.getSession = (req, res) => {
   console.log(req.session);
   res.send({message : req.session});
