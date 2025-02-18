@@ -1,5 +1,5 @@
 const express = require("express");
-const router = express.Router({ mergeParams: true }); // 👈 이 부분 추가!
+const router = express.Router({ mergeParams: true }); // app.js의 라우터 경로의 params 값을 받아올 수 있도록
 const controller = require("../controllers/Ctodos");
 
 // todos 라우터의 기본 URL은 todos/ 입니다!!!
@@ -17,7 +17,6 @@ router.patch("/:todo_id", controller.patchTodo);
 router.delete("/:todo_id", controller.deleteTodo);
 // 업무 상태 변경
 router.patch("/state/:todo_id", controller.patchTodoState);
-
 
 module.exports = router;
 

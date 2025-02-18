@@ -1,6 +1,6 @@
+// models/index.js
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-// models/index.js
 const User = require('./User');
 const Workspace = require('./Workspace');
 const WorkspaceMember = require('./WorkspaceMember');
@@ -10,6 +10,7 @@ const Todo = require('./Todo');
 const Worker = require('./Worker');
 const Tag = require('./Tag');
 const TodoTags = require('./TodoTags');
+const { fa } = require('@faker-js/faker');
 
 // ─────────────────────────────────────────────────────────
 // 1) User ↔ Workspace (1 : 1)
