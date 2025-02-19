@@ -1,7 +1,8 @@
 const passport = require('passport');
 const kakaoStrategy = require('passport-kakao').Strategy;
 const User = require('../models/User');
-const env = 'development';
+// const env = 'production';
+const env = 'localDev';
 const config = require(__dirname + '/../config/config.json')[env];
 const kakaoConfig = config.kakao;
 

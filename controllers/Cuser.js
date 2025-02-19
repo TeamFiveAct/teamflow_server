@@ -72,7 +72,7 @@ exports.postJoin = async (req, res) => {
 // 닉네임 중복 확인 GET /v1/user/check-name
 exports.getCheckName = async (req, res) => {
   try {
-    const { nickname } = req.body;
+    const { nickname } = req.query;
     const existName = await User.findOne({
       where: Sequelize.literal(`BINARY nickname = '${nickname}'`),
     });
@@ -102,7 +102,7 @@ exports.getCheckName = async (req, res) => {
 // 이메일 중복 확인 GET /v1/user/check-email
 exports.getCheckEmail = async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email } = req.query;
     const existEmail = await User.findOne({ where: { email } });
     if (existEmail) {
       return res.send({
@@ -348,6 +348,7 @@ exports.deleteMyInfo = async (req, res) => {
   }
 };
 
+// 세션 삭제
 const logoutAndDestroySession = (req, res, successMessage) => {
   req.logout((err) => {
     if (err)
