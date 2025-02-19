@@ -139,7 +139,7 @@ exports.postLogin = (req, res, next) => {
     }
 
     const userData = await User.findOne({
-      where: { user_id: user_id },
+      where: { email: req.body.email },
       paranoid: false,
     });
 
