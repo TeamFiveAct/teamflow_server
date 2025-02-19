@@ -2,7 +2,10 @@ const Workspace = require("../models/Workspace");
 const workSpaceModel = require("../models/Workspace");
 const userModel = require('../models/User');
 const workSpaceMemberModel = require("../models/WorkspaceMember");
+const sendEmailMiddleware = require('../middlewares/emailMiddleware'); // 이메일 미들웨어
 const nodemailer = require("nodemailer");
+const env = 'localDev';
+const config = require(__dirname + '/../config/config.json')[env];
 
 /*
 1. 워크스페이스 생성
@@ -193,5 +196,44 @@ exports.postSpaceJoin = async (req,res)=>{
   }
 
   res.send({});
-
 }
+
+
+// 이메일 발송을 위한 Nodemailer 설정
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "revecloud7@gmail.com",
+    pass: config.emailPass,
+  },
+});
+// 협업초대 메일발송
+exports.postSpaceInvite = async (req, res, next) => {
+    try {
+        const { email, space_id } = req.body;
+
+        if (!email || !space_id) {
+            return res.status(400).json({ error: "이메일과 워크스페이스 ID가 필요합니다." });
+        }
+
+        // 예제 초대 코드 (실제 서비스에서는 DB에서 가져오거나 생성해야 함)
+        const inviteCode = "ABC123";
+
+        // 이메일 발송 내용을 req.body에 추가하여 미들웨어에서 사용함!
+        req.body.subject = "TeamFlow - 워크스페이스에 초대되었습니다!";
+        req.body.to = email;
+        req.body.text = `워크스페이스에 초대되었습니다. 초대 코드: ${inviteCode}`;
+        req.body.html = `<p>워크스페이스에 초대되었습니다.</p><p>초대 코드: <b>${inviteCode}</b></p>`;
+
+        // 이메일 미들웨어 실행
+        sendEmailMiddleware(req, res, () => {
+            res.status(200).json({
+                message: "초대 이메일이 전송되었습니다.",
+                emailStatus: req.emailStatus,
+            });
+        });
+    } catch (error) {
+        console.error("초대 이메일 전송 오류:", error);
+        res.status(500).json({ error: "초대 이메일 전송 중 오류가 발생했습니다." });
+    }
+};
