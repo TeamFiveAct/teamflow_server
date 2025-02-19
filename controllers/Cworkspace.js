@@ -246,15 +246,6 @@ exports.postSpaceJoin = async (req, res) => {
   }
 };
 
-// 이메일 발송을 위한 Nodemailer 설정
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'revecloud7@gmail.com',
-    pass: config.emailPass,
-  },
-});
-
 // 협업초대 메일발송
 exports.postSpaceInvite = async (req, res, next) => {
   try {
