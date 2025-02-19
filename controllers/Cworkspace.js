@@ -1,11 +1,7 @@
-const Workspace = require("../models/Workspace");
 const workSpaceModel = require("../models/Workspace");
 const userModel = require('../models/User');
 const workSpaceMemberModel = require("../models/WorkspaceMember");
 const sendEmailMiddleware = require('../middlewares/emailMiddleware'); // 이메일 미들웨어
-const nodemailer = require("nodemailer");
-const env = 'localDev';
-const config = require(__dirname + '/../config/config.json')[env];
 
 /*
 1. 워크스페이스 생성
@@ -15,8 +11,7 @@ const config = require(__dirname + '/../config/config.json')[env];
 5. 특정 워크스페이스의 참여한 참여자 조회
 */
 
-
-// 협업 생성
+// 워크스페이스스 생성
 exports.postSpaceCreate = async (req, res) => {
   try {
     const workSpace = await workSpaceModel.create({
@@ -42,7 +37,7 @@ exports.postSpaceCreate = async (req, res) => {
   }
 };
 
-// 특정 협업 조회
+// 특정 워크스페이스스 조회
 exports.getSpace = async (req,res)=>{
   try{
     const { space_id } = req.params;
@@ -50,7 +45,7 @@ exports.getSpace = async (req,res)=>{
       where: {
         space_id: space_id,
       }
-    })
+    });
 
     res.json({
       status: "SUCCESS",
@@ -117,16 +112,6 @@ exports.getMySpace = async (req,res)=>{
 
 // 특정 워크스페이스에 참여한 참여자 전체 조회
 exports.postSpaceMember = async (req, res) => {
-
-  // 로그인체크
-  if (!req.isAuthenticated()) {
-    return res.json({
-      status: 'ERROR',
-      message: '로그인이 필요합니다.',
-      data: null,
-    });
-  }
-
   try {
     const { space_id } = req.params;
 
@@ -186,31 +171,22 @@ exports.postSpaceMember = async (req, res) => {
 // 워크스페이스 참여
 exports.postSpaceJoin = async (req,res)=>{
 
-  // 로그인체크
-    if (!req.isAuthenticated()) {
-    return res.json({
-      status: 'ERROR',
-      message: '로그인이 필요합니다.',
-      data: null,
-    });
-  }
-
   res.send({});
 }
 
-
-// 이메일 발송을 위한 Nodemailer 설정
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: "revecloud7@gmail.com",
-    pass: config.emailPass,
-  },
-});
-// 협업초대 메일발송
+// 협업초대 메일발송 (보류기능 미사용)
 exports.postSpaceInvite = async (req, res, next) => {
     try {
+      // 프론트에서 이메일과 해당 워크스페이스 아이디를 받음
         const { email, space_id } = req.body;
+
+        // 받은 정보로 어떤 워크 스페이스인지 정보를 가져옴
+        const workSpaceInfo = await workSpaceModel.findOne({
+          where: {
+            space_id: space_id,
+          },
+          attributes: ['space_title']
+        });
 
         if (!email || !space_id) {
             return res.status(400).json({ error: "이메일과 워크스페이스 ID가 필요합니다." });
@@ -220,7 +196,7 @@ exports.postSpaceInvite = async (req, res, next) => {
         const inviteCode = "ABC123";
 
         // 이메일 발송 내용을 req.body에 추가하여 미들웨어에서 사용함!
-        req.body.subject = "TeamFlow - 워크스페이스에 초대되었습니다!";
+        req.body.subject = `TeamFlow - ${workSpaceInfo.dataValues.space_title} 워크스페이스에 초대되었습니다!`;
         req.body.to = email;
         req.body.text = `워크스페이스에 초대되었습니다. 초대 코드: ${inviteCode}`;
         req.body.html = `<p>워크스페이스에 초대되었습니다.</p><p>초대 코드: <b>${inviteCode}</b></p>`;
@@ -232,6 +208,8 @@ exports.postSpaceInvite = async (req, res, next) => {
                 emailStatus: req.emailStatus,
             });
         });
+
+        res.send({})
     } catch (error) {
         console.error("초대 이메일 전송 오류:", error);
         res.status(500).json({ error: "초대 이메일 전송 중 오류가 발생했습니다." });

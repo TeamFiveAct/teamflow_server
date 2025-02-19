@@ -13,7 +13,7 @@ router.post("/", isAuthenticated, controller.postSpaceCreate);
 router.get("/user", isAuthenticated, controller.getMySpace);
 
 // 워크스페이스 초대 (POST가 적절)
-router.post("/invite", isAuthenticated, controller.postSpaceInvite);
+router.post("/invite", controller.postSpaceInvite);
 
 // 워크스페이스 참여 신청 (초대 코드 입력 후 참여)
 router.post("/join", isAuthenticated, controller.postSpaceJoin);
