@@ -1,20 +1,17 @@
 const Workspace = require("../models/Workspace");
 const workSpaceModel = require("../models/Workspace");
+const userModel = require('../models/User');
 const workSpaceMemberModel = require("../models/WorkspaceMember");
+const nodemailer = require("nodemailer");
 
 /*
-
-### **2. 협업 공간 테이블 (`workspace`s)**
-
-| 컬럼명 | 타입 | 설명 | NULL 여부 |
-| --- | --- | --- | --- |
-| `space_id` | `BIGINT` | 워크스페이스 ID | auto_increment |
-| `space_title` | `VARCHAR(255)` | 협업 공간 이름 | NOT NULL |
-| `space_description` | `VARCHAR(255)` | 협업 소개 | NULL |
-| `space_password` | `VARCHAR(255)` | 협업 공간 비밀번호 | NOT NULL |
-| `user_id` | `BIGINT` | 생성한 사용자 ID (FK) | NOT NULL |
-| `created_at` | `TIMESTAMP` | 생성 날짜 | 자동생성 |
+1. 워크스페이스 생성
+2. 워크스페이스 조회
+3. 특정 워크스페이스 조회
+4. 개인별(나의) 워크 스페이스 조회회
+5. 특정 워크스페이스의 참여한 참여자 조회
 */
+
 
 // 협업 생성
 exports.postSpaceCreate = async (req, res) => {
@@ -67,21 +64,44 @@ exports.getSpace = async (req,res)=>{
   }
 }
 
-// 내가 참여한 워크스페이스 전체 조회
+// 개인별(내가가) 참여한 워크스페이스 전체 조회
 exports.getMySpace = async (req,res)=>{
   try{
-    const { user_id } = req.body;
-    const workSpace = await workSpaceModel.findAll({
+    const { user_id } = req.query;
+    const workSpaceMeber = await workSpaceMemberModel.findAll({
       where: {
         user_id: user_id,
-      }
+      },
+      attributes: ['space_id']
+    })
+
+    // 참여한 워크스페이스가가 없으면 빈 배열 반환
+    if (workSpaceMeber.length === 0) {
+      return res.json({
+        status: "SUCCESS",
+        message: "참여한한 워크스페이스가 없습니다.",
+        data: {},
+      });
+    }
+
+    // 내가 참여한 space_id 정보를 필터링
+    const myspace = workSpaceMeber.map( item => item.space_id)
+    
+    // 내가 속한 space_id 로 전체 워크스페이스 정보 조회
+    const myWorkspcae = await workSpaceModel.findAll({
+      where: {
+        space_id: myspace,
+      },
+      attributes: ['space_id', 'space_title']
     })
 
     res.json({
       status: "SUCCESS",
       message: "내가 참여한 협업 조회성공",
-      data: {...workSpace.dataValues},
+      data: myWorkspcae
     });
+
+
   }catch(err){
     console.log("getWorkSpace Controller Err:", error);
     res.status(500).json({
@@ -92,45 +112,86 @@ exports.getMySpace = async (req,res)=>{
   }
 }
 
+// 특정 워크스페이스에 참여한 참여자 전체 조회
+exports.postSpaceMember = async (req, res) => {
 
-// 특정 워크스페이스에 참여한 참여자 전체조회
-exports.postSpaceMember = async(req,res)=>{
-  try{
-    const { space_id } = req.body;
-    const workSpaceMember = await workSpaceMemberModel.findAll({
+  // 로그인체크
+  if (!req.isAuthenticated()) {
+    return res.json({
+      status: 'ERROR',
+      message: '로그인이 필요합니다.',
+      data: null,
+    });
+  }
+
+  try {
+    const { space_id } = req.params;
+
+    /**
+     * 특정 협업에 속한 참여자 정보 조회
+     * {mem_id, space_id, user_id}
+     */
+    const workSpaceMembers = await workSpaceMemberModel.findAll({
       where: {
         space_id: space_id,
       }
-    })
+    });
 
-    const workSpace = await workSpaceModel.findAll({
+    // 참여자가 없으면 빈 배열 반환
+    if (workSpaceMembers.length === 0) {
+      return res.json({
+        status: "SUCCESS",
+        message: "해당 워크스페이스에 참여자가 없습니다.",
+        data: {},
+      });
+    }
+
+
+    const userList = workSpaceMembers.map(member => member.dataValues.user_id);
+
+    /**
+     * 전체 사용자 정보 조회
+     * {user_id, nickname}
+     */
+    const members = await userModel.findAll({
       where: {
-        space_id: space_id,
-      }
-    })
-
-    // console.log("workspacemember",workSpaceMember);
-    console.log("workspace",workSpace);
+        user_id: userList
+      },
+      attributes: ['user_id', 'nickname']
+    });
 
     res.json({
       status: "SUCCESS",
-      message: `${space_id}협업 참여자 조회완료`,
-      data: {
-        // space_title: workSpace.dataValues.space_title,
-      },
+      message: "전체 사용자 조회 성공",
+      data: members.map(member => ({
+        space_id,
+        ...member.dataValues
+      })),
     });
 
+  } catch (err) {
+    console.error("postSpaceMember Controller Err:", err); // 에러 로그 수정
 
-  }catch(err){
-    console.log("getWorkSpace Controller Err:", error);
     res.status(500).json({
       status: "ERROR",
-      message: "내가 참여한 협업 조회에 실패하였습니다.",
-      data: {},
+      message: "전체 사용자 조회 실패",
+      data: null
     });
   }
-}
+};
 
-exports.index = async (req,res)=>{
-  
+// 워크스페이스 참여
+exports.postSpaceJoin = async (req,res)=>{
+
+  // 로그인체크
+    if (!req.isAuthenticated()) {
+    return res.json({
+      status: 'ERROR',
+      message: '로그인이 필요합니다.',
+      data: null,
+    });
+  }
+
+  res.send({});
+
 }
