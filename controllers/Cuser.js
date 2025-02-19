@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const passport = require('passport');
 const axios = require('axios');
+const { Op, Sequelize } = require('sequelize');
 
 exports.getTest = (req, res) => {
   res.send({ message: 'test' });
@@ -60,8 +61,11 @@ exports.postJoin = async (req, res) => {
 // 닉네임 중복 확인 GET /v1/user/check-name
 exports.getCheckName = async (req, res) => {
   try {
-    const { nickname } = req.query;
-    const existName = await User.findOne({ where: { nickname } });
+    const { nickname } = req.body;
+    const existName = await User.findOne({
+      where: Sequelize.literal(`BINARY nickname = '${nickname}'`),
+    });
+    console.log(existName);
     if (existName) {
       return res.send({
         status: 'ERROR',
@@ -87,7 +91,7 @@ exports.getCheckName = async (req, res) => {
 // 이메일 중복 확인 GET /v1/user/check-email
 exports.getCheckEmail = async (req, res) => {
   try {
-    const { email } = req.query;
+    const { email } = req.body;
     const existEmail = await User.findOne({ where: { email } });
     if (existEmail) {
       return res.send({
