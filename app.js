@@ -7,6 +7,7 @@ const { Server } = require('socket.io');
 const session = require('express-session');
 const passport = require('./config/passport');
 //const env = 'production';
+const cors = require('cors');
 const env = 'development';
 const config = require('./config/config.json')[env];
 
@@ -18,6 +19,7 @@ const PORT = 8000;
 
 // JSON 요청 및 URL 인코딩된 요청 처리
 app.use(express.json());
+app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 
 // 세션 및 Passport 설정
@@ -28,16 +30,14 @@ app.use(
     saveUninitialized: false,
     cookie: {
       maxAge: 4 * 60 * 60 * 1000, // 세션 임시 4시간으로 설정
-      secure : false,
-      httpOnly : true
+      secure: false,
+      httpOnly: true,
     },
   })
 );
 
-
 app.use(passport.initialize());
 app.use(passport.session());
-
 
 // 라우터 로드
 const userRouter = require('./routes/user');
@@ -45,8 +45,6 @@ const workspaceRouter = require('./routes/workspace');
 const todosRouter = require('./routes/todos');
 const uploadRouter = require('./routes/upload'); // 파일 업로드 라우터
 const chatSocket = require('./sockets/chat'); // Socket.io 이벤트 핸들러
-
-
 
 // 업로드 폴더 생성 및 정적 파일 서빙
 const uploadDir = path.join(__dirname, 'uploads');

@@ -12,11 +12,12 @@ exports.getTest = (req, res) => {
 // 회원가입 POST /api/user/join
 exports.postJoin = async (req, res) => {
   try {
-    const { email, password_hash, nickname } = req.body;
+    const { email, password_hash, nickname, profile_image } = req.body;
     console.log(email);
     console.log(password_hash);
     console.log(nickname);
-    if (!email || !password_hash || !nickname) {
+    console.log(profile_image);
+    if (!email || !password_hash || !nickname || !profile_image) {
       return res.send({
         status: 'ERROR',
         message: '이메일, 비번, 닉네임을 모두 입력해주세요.',
@@ -38,6 +39,7 @@ exports.postJoin = async (req, res) => {
       password_hash: hasedPassword,
       nickname,
       auth_provider: 'email',
+      profile_image,
     });
 
     return res.send({
@@ -140,7 +142,6 @@ exports.getKakaoLogin = (req, res, next) => {
   passport.authenticate('kakao')(req, res, next);
 };
 
-
 // 클라언트가 호출 할 필요 없이 자동으로 호출됨
 exports.getKakaoCallback = (req, res, next) => {
   passport.authenticate('kakao', (err, user, info) => {
@@ -173,7 +174,6 @@ exports.getKakaoCallback = (req, res, next) => {
   })(req, res, next);
 };
 
-
 // 이메일 기반 로그아웃 POST /v1/user/logout
 exports.postLogout = (req, res) => {
   console.log('로그아웃 전 세션 확인', req.session);
@@ -195,7 +195,6 @@ exports.postLogout = (req, res) => {
 exports.postKakaoLogout = async (req, res, next) => {
   console.log('로그아웃 전 세션 확인', req.session);
   try {
-
     if (!req.session.passport || !req.session.passport.user) {
       return res.send({
         status: 'ERROR',
@@ -204,7 +203,7 @@ exports.postKakaoLogout = async (req, res, next) => {
       });
     }
 
-    const accessToken = req.session.passport.user.access_token; 
+    const accessToken = req.session.passport.user.access_token;
 
     if (!accessToken) {
       return res.send({
@@ -226,7 +225,7 @@ exports.postKakaoLogout = async (req, res, next) => {
       req.session.destroy((sessionErr) => {
         if (sessionErr) return next(sessionErr);
 
-        res.clearCookie('connect.sid'); 
+        res.clearCookie('connect.sid');
 
         return res.send({
           status: 'SUCCESS',
@@ -247,6 +246,5 @@ exports.postKakaoLogout = async (req, res, next) => {
 // 현재 로그인한 사용자 세션 확인 GET /v1/user/session
 exports.getSession = (req, res) => {
   console.log(req.session);
-  res.send({message : req.session});
-}
-
+  res.send({ message: req.session });
+};
