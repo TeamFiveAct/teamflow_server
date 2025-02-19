@@ -6,9 +6,9 @@ const multer = require('multer');
 const { Server } = require('socket.io');
 const session = require('express-session');
 const passport = require('./config/passport');
-//const env = 'production';
+const env = 'localDev';
 const cors = require('cors');
-const env = 'development';
+//const env = 'development';
 const config = require('./config/config.json')[env];
 
 const db = require('./models'); // index.js에서 export 한 모든 모델
