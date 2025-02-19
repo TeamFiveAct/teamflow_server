@@ -237,6 +237,7 @@ exports.postSpaceJoin = async (req, res) => {
     });
   } catch (err) {
     console.log('err', err);
+    // 서버 오류 발생시
     return res.send({
       status: 'ERROR',
       message: '서버 오류가 발생했습니다.',
