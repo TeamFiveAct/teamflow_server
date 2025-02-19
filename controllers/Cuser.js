@@ -184,19 +184,6 @@ exports.getKakaoCallback = (req, res, next) => {
       });
     }
 
-    const userData = await User.findOne({
-      where: { user_id: user_id },
-      paranoid: false,
-    });
-
-    if (userData && userData.deleted_at) {
-      return res.send({
-        status: 'ERROR',
-        message: '탈퇴한 회원입니다. 복구를 원하시면 관리자에게 문의하세요.',
-        data: null,
-      });
-    }
-
     req.login(user, (loginErr) => {
       if (loginErr) {
         return next(loginErr);
