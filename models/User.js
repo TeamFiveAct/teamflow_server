@@ -57,6 +57,7 @@ const User = sequelize.define(
   {
     tableName: 'users',
     timestamps: false, // created_at 등을 직접 다룬다면 true일 필요가 없을 수 있습니다.
+    paranoid: true,
   }
 );
 

@@ -25,8 +25,19 @@ exports.postJoin = async (req, res) => {
         data: null,
       });
     }
-    const existsEmail = await User.findOne({ where: { email } });
+    const existsEmail = await User.findOne({
+      where: { email },
+      paranoid: false,
+    });
 
+    // 이미 탈퇴한 계정이라면
+    if (existsEmail && existsEmail.deleted_at) {
+      return res.send({
+        status: 'ERROR',
+        message: '탈퇴한 계정입니다. 복구를 원하시면 관리자에게 문의하세요.',
+        data: null,
+      });
+    }
     if (existsEmail) {
       return res.send({
         status: 'ERROR',
@@ -117,12 +128,25 @@ exports.getCheckEmail = async (req, res) => {
 
 // 이메일 기반 로그인 POST /v1/user/login
 exports.postLogin = (req, res, next) => {
-  passport.authenticate('local', (err, user, info) => {
+  passport.authenticate('local', async (err, user, info) => {
     if (err) return next(err);
     if (!user) {
       return res.send({
         status: 'ERROR',
         message: info.message || '로그인 실패했습니다.',
+        data: null,
+      });
+    }
+
+    const userData = await User.findOne({
+      where: { user_id: user_id },
+      paranoid: false,
+    });
+
+    if (userData && userData.deleted_at) {
+      return res.send({
+        status: 'ERROR',
+        message: '탈퇴한 회원입니다. 복구를 원하시면 관리자에게 문의하세요.',
         data: null,
       });
     }
@@ -148,7 +172,7 @@ exports.getKakaoLogin = (req, res, next) => {
 
 // 클라언트가 호출 할 필요 없이 자동으로 호출됨
 exports.getKakaoCallback = (req, res, next) => {
-  passport.authenticate('kakao', (err, user, info) => {
+  passport.authenticate('kakao', async (err, user, info) => {
     if (err) {
       return next(err);
     }
@@ -156,6 +180,19 @@ exports.getKakaoCallback = (req, res, next) => {
       return res.send({
         status: 'ERROR',
         message: '로그인 실패했습니다.',
+        data: null,
+      });
+    }
+
+    const userData = await User.findOne({
+      where: { user_id: user_id },
+      paranoid: false,
+    });
+
+    if (userData && userData.deleted_at) {
+      return res.send({
+        status: 'ERROR',
+        message: '탈퇴한 회원입니다. 복구를 원하시면 관리자에게 문의하세요.',
         data: null,
       });
     }
