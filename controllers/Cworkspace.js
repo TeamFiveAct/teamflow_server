@@ -1,9 +1,9 @@
 const Workspace = require('../models/Workspace');
 const workSpaceModel = require('../models/Workspace');
 const userModel = require('../models/User');
-const workSpaceMemberModel = require('../models/WorkspaceMember');
+const workSpaceMemberModel = require("../models/WorkspaceMember");
 const sendEmailMiddleware = require('../middlewares/emailMiddleware'); // 이메일 미들웨어
-const nodemailer = require('nodemailer');
+const nodemailer = require("nodemailer");
 const env = 'localDev';
 const config = require(__dirname + '/../config/config.json')[env];
 
@@ -145,10 +145,7 @@ exports.postSpaceMember = async (req, res) => {
       });
     }
 
-    const userList = workSpaceMembers.map(
-      (member) => member.dataValues.user_id
-    );
-
+    const userList = workSpaceMembers.map(member => member.dataValues.user_id);
     /**
      * 전체 사용자 정보 조회
      * {user_id, nickname}
@@ -257,6 +254,7 @@ const transporter = nodemailer.createTransport({
     pass: config.emailPass,
   },
 });
+
 // 협업초대 메일발송
 exports.postSpaceInvite = async (req, res, next) => {
   try {
