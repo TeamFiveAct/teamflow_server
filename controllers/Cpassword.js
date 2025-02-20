@@ -103,8 +103,12 @@ class PasswordController {
         }
     }
 
-    // 비밀번호 재설정 처리
-// controllers/Cpassword.js
+
+
+
+    
+// 비밀번호 재설정 처리
+
 static async resetPassword(req, res) {
     try {
         const { token, password } = req.body;
