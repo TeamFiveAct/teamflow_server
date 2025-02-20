@@ -1,6 +1,7 @@
 const express = require('express');
 const http = require('http');
 const path = require('path');
+const ejs = require('ejs');
 const fs = require('fs');
 const multer = require('multer');
 const { Server } = require('socket.io');
@@ -22,6 +23,10 @@ app.use(express.json());
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 
+// EJS 설정
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
 // 세션 및 Passport 설정
 app.use(
   session({
@@ -41,6 +46,7 @@ app.use(passport.session());
 
 // 라우터 로드
 const userRouter = require('./routes/user');
+const passwordRouter = require('./routes/password');
 const workspaceRouter = require('./routes/workspace');
 const todosRouter = require('./routes/todos');
 const uploadRouter = require('./routes/upload'); // 파일 업로드 라우터
@@ -60,6 +66,7 @@ app.get('/', (req, res) => {
 
 // 라우터 연결 (필요에 따라 경로 조정)
 app.use('/v1/user', userRouter);
+app.use('/v1/user', passwordRouter); // 비밀번호 재설정 라우트
 app.use('/v1/workspace', workspaceRouter);
 app.use('/v1/workspace/:space_id/todos', todosRouter);
 app.use('/upload', uploadRouter);

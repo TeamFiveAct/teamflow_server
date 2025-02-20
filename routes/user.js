@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/Cuser');
 
+
+
+
+
 // 회원가입
 router.post('/join', controller.postJoin);
 
@@ -32,4 +36,8 @@ router.get('/session', controller.getSession);
 // 회원탈퇴
 router.delete('/', controller.deleteMyInfo);
 
+//사용자정보조회
+router.get('/info', controller.getUserInfo);
+//사용자정보수정
+router.put('/info', controller.updateUserInfo);
 module.exports = router;

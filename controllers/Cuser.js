@@ -1,3 +1,4 @@
+//controllers\Cuser.js
 const db = require('../models');
 const express = require('express');
 const bcrypt = require('bcrypt');
@@ -267,6 +268,144 @@ exports.postKakaoLogout = async (req, res, next) => {
       status: 'ERROR',
       message: '카카오 로그아웃 실패했습니다.',
       error: err.message,
+    });
+  }
+};
+
+
+//유저정보조회
+
+// 사용자 정보 조회 GET /v1/user/info
+exports.getUserInfo = async (req, res) => {
+  try {
+    // 로그인 상태 확인
+    if (!req.session.passport || !req.session.passport.user) {
+      return res.send({
+        status: 'ERROR',
+        message: '로그인 상태가 아닙니다.',
+        data: null,
+      });
+    }
+
+    const { user_id } = req.session.passport.user;
+    const user = await User.findOne({ where: { user_id } });
+
+    if (!user) {
+      return res.send({
+        status: 'ERROR',
+        message: '사용자 정보를 찾을 수 없습니다.',
+        data: null,
+      });
+    }
+
+    // 민감한 정보는 제외하고 사용자 정보를 반환합니다.
+    const { email, nickname, profile_image, auth_provider, kakao_id, created_at } = user;
+    return res.send({
+      status: 'SUCCESS',
+      message: '사용자 정보 조회 성공.',
+      data: { user_id, email, nickname, profile_image, auth_provider, kakao_id, created_at },
+    });
+  } catch (err) {
+    console.log('getUserInfo error:', err);
+    return res.send({
+      status: 'ERROR',
+      message: '서버 오류가 발생했습니다.',
+      data: null,
+    });
+  }
+};
+
+
+// 사용자 정보 수정 PUT /v1/user/info
+exports.updateUserInfo = async (req, res) => {
+  try {
+    // 로그인 상태 확인
+    if (!req.session.passport || !req.session.passport.user) {
+      return res.send({
+        status: 'ERROR',
+        message: '로그인 상태가 아닙니다.',
+        data: null,
+      });
+    }
+
+    const { user_id } = req.session.passport.user;
+    const user = await User.findOne({ where: { user_id } });
+    if (!user) {
+      return res.send({
+        status: 'ERROR',
+        message: '사용자 정보를 찾을 수 없습니다.',
+        data: null,
+      });
+    }
+
+    // 클라이언트로부터 수정할 필드를 받아옵니다.
+    // 예제에서는 email, nickname, profile_image, 그리고 password(평문)를 허용합니다.
+    const { email, nickname, profile_image, password } = req.body;
+    let updateData = {};
+
+    // 이메일 수정 시 중복 체크 (현재 사용자의 이메일은 제외)
+    if (email && email !== user.email) {
+      const emailExists = await User.findOne({
+        where: { email, user_id: { [Op.ne]: user_id } },
+      });
+      if (emailExists) {
+        return res.send({
+          status: 'ERROR',
+          message: '이미 사용중인 이메일입니다.',
+          data: null,
+        });
+      }
+      updateData.email = email;
+    }
+
+    // 닉네임 수정 시 중복 체크 (BINARY 비교, 현재 사용자는 제외)
+    if (nickname && nickname !== user.nickname) {
+      const nicknameExists = await User.findOne({
+        where: Sequelize.literal(`BINARY nickname = '${nickname}' AND user_id != ${user_id}`),
+      });
+      if (nicknameExists) {
+        return res.send({
+          status: 'ERROR',
+          message: '이미 사용중인 닉네임입니다.',
+          data: null,
+        });
+      }
+      updateData.nickname = nickname;
+    }
+
+    // 프로필 이미지 수정
+    if (profile_image) {
+      updateData.profile_image = profile_image;
+    }
+
+    // 비밀번호 수정 (평문이 전달되면 bcrypt로 해싱)
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      updateData.password_hash = hashedPassword;
+    }
+
+    // 업데이트할 내용이 없는 경우
+    if (Object.keys(updateData).length === 0) {
+      return res.send({
+        status: 'SUCCESS',
+        message: '변경사항이 없습니다.',
+        data: null,
+      });
+    }
+
+    await user.update(updateData);
+
+    return res.send({
+      status: 'SUCCESS',
+      message: '사용자 정보가 성공적으로 업데이트되었습니다.',
+      data: updateData,
+    });
+  } catch (err) {
+    console.log('updateUserInfo error:', err);
+    return res.send({
+      status: 'ERROR',
+      message: '서버 오류가 발생했습니다.',
+      data: null,
     });
   }
 };
