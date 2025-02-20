@@ -7,7 +7,7 @@ const transporter = nodemailer.createTransport({
     secure: true,            // true: SSL 사용, false: TLS 사용
     auth: {
         user: "revecloud7@gmail.com",
-        pass: "obgm iunj nxvs uyvw",
+        pass: "avoy lgao qruw plwd",
     },
 });
 
