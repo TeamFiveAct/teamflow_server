@@ -66,7 +66,7 @@ app.get('/', (req, res) => {
 
 // 라우터 연결 (필요에 따라 경로 조정)
 app.use('/v1/user', userRouter);
-app.use('/', passwordRouter); // 비밀번호 재설정 라우트
+app.use('/v1/user', passwordRouter); // 비밀번호 재설정 라우트
 app.use('/v1/workspace', workspaceRouter);
 app.use('/v1/workspace/:space_id/todos', todosRouter);
 app.use('/upload', uploadRouter);
