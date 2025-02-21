@@ -115,7 +115,7 @@ PasswordReset.belongsTo(User, {
 });
 
 // 데이터베이스 동기화
-sequelize.sync({ force: false }).then(() => {
+sequelize.sync({ force: true }).then(() => {
   console.log('Database synced!');
 });
 
