@@ -9,7 +9,6 @@ const session = require('express-session');
 const passport = require('./config/passport');
 const env = 'localDev';
 const cors = require('cors');
-//const env = 'development';
 const config = require('./config/config.json')[env];
 
 const db = require('./models'); // index.js에서 export 한 모든 모델
@@ -20,8 +19,15 @@ const PORT = 8000;
 
 // JSON 요청 및 URL 인코딩된 요청 처리
 app.use(express.json());
-app.use(cors());
 app.use(express.urlencoded({ extended: true }));
+
+// CORS 미들웨어 (중복 호출 제거, 모든 라우트 전에 등록)
+app.use(
+  cors({
+    origin: 'http://localhost:3000', // 클라이언트 도메인 지정
+    credentials: true, // 쿠키와 인증정보 포함 허용
+  })
+);
 
 // EJS 설정
 app.set('view engine', 'ejs');
@@ -34,7 +40,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      maxAge: 4 * 60 * 60 * 1000, // 세션 임시 4시간으로 설정
+      maxAge: 4 * 60 * 60 * 1000, // 세션 임시 4시간 설정
       secure: false,
       httpOnly: true,
     },
@@ -80,7 +86,7 @@ app.use((req, res) => {
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: '*', // 개발용. 배포 시 허용 도메인 지정
+    origin: '*', // Socket.io는 별도의 설정 (개발용, 배포 시 수정 필요)
   },
 });
 
