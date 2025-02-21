@@ -10,18 +10,19 @@ const passport = require('./config/passport');
 const env = 'localDev';
 const cors = require('cors');
 const config = require('./config/config.json')[env];
-const swaggerUi = require('swagger-ui-express');
 const db = require('./models'); // index.js에서 export 한 모든 모델
-const YAML = require('yamljs');
+const { swaggerUi, specs } = require('./swagger');
 
 const app = express();
 require('dotenv').config();
 const PORT = 8000;
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 // swagger.yaml 파일 불러오기
-const swaggerDocument = YAML.load('./swagger.yaml');
+// const swaggerDocument = YAML.load('./swagger.yaml');
 
 // Swagger UI 미들웨어 등록
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+//app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // JSON 요청 및 URL 인코딩된 요청 처리
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -100,5 +101,7 @@ chatSocket(io);
 
 // 서버 실행
 server.listen(PORT, () => {
-  console.log(`🚀 서버가 ${PORT} 포트에서 실행 중...`);
+  console.log(
+    `🚀 서버가 ${PORT} 포트에서 실행 중...API 문서는 http://localhost:${PORT}/api-docs 에서 확인하세요.`
+  );
 });
