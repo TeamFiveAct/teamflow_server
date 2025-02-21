@@ -332,6 +332,84 @@ router.get('/check-email', controller.getCheckEmail);
 // 이메일 기반 로그인
 router.post('/login', controller.postLogin);
 
+/**
+ * @swagger
+ * /v1/user/kakao-login:
+ *   post:
+ *     summary: 사용자 로그인 (카카오 기반)
+ *     description: 카카오 기반으로 사용자 로그인을 합니다.
+ *     tags: [User]
+ *     requestBody:
+ *       required: false
+ *     responses:
+ *       200:
+ *         description: 로그인 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "SUCCESS"
+ *                 message:
+ *                   type: string
+ *                   example: "로그인이 성공되었습니다."
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     nickname:
+ *                       type: string
+ *                       example: "nickname123"
+ *       404:
+ *         description: 가입된 사용자가 아닐 경우
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "가입된 사용자가 아닙니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       403:
+ *         description: 비밀번호가 틀릴 경우
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "비밀번호를 확인하세요."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       500:
+ *         description: 서버 오류가 발생
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류가 발생했습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ */
 // 카카오 기반 로그인
 router.get('/kakao-login', controller.getKakaoLogin);
 
