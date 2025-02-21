@@ -3,15 +3,29 @@ const swaggerUi = require('swagger-ui-express');
 
 const options = {
   definition: {
-    openapi: '3.0.0', // OpenAPI 버전
     info: {
       title: 'Node.js API with Swagger',
       version: '1.0.0',
-      description: '이 API 문서는 Swagger를 사용하여 자동 생성되었습니다.',
+      description: 'TeamFlow 홈페이지의 Swagger 입니다.',
     },
     servers: [
       {
         url: 'http://localhost:8000', // 서버 주소 (배포 후 수정 가능)
+      },
+    ],
+    components: {
+      securitySchemes: {
+        CookieAuth: {
+          type: 'apiKey',
+          in: 'cookie',
+          name: 'connect.sid', // Express의 기본 세션 쿠키 이름 (수정 가능)
+          description: '세션 기반 인증을 위한 쿠키',
+        },
+      },
+    },
+    security: [
+      {
+        CookieAuth: [],
       },
     ],
   },
