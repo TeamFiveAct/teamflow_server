@@ -22,7 +22,7 @@ router.post("/join", isAuthenticated, controller.postSpaceJoin);
 router.get("/:space_id", isAuthenticated, controller.getSpace);
 
 // 특정 워크스페이스 멤버 조회 (GET이 더 적절)
-router.post("/:space_id/member", isAuthenticated, controller.postSpaceMember);
+router.get("/:space_id/member", isAuthenticated, controller.getSpaceMember);
 
 
 module.exports = router;

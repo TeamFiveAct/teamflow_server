@@ -50,6 +50,9 @@ exports.getSpace = async (req, res) => {
         space_id: space_id,
       },
     });
+  
+
+    
 
     res.json({
       status: 'SUCCESS',
@@ -57,7 +60,7 @@ exports.getSpace = async (req, res) => {
       data: { ...workSpace.dataValues },
     });
   } catch (err) {
-    console.log('getWorkSpace Controller Err:', error);
+    console.log('getWorkSpace Controller Err:', err);
     res.status(500).json({
       status: 'ERROR',
       message: '협업 조회에 실패하였습니다.',
@@ -113,7 +116,7 @@ exports.getMySpace = async (req, res) => {
 };
 
 // 특정 워크스페이스에 참여한 참여자 전체 조회
-exports.postSpaceMember = async (req, res) => {
+exports.getSpaceMember = async (req, res) => {
   // 로그인체크
   if (!req.isAuthenticated()) {
     return res.json({

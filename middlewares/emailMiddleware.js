@@ -1,3 +1,5 @@
+const env = 'localDev';
+const config = require(__dirname + '/../config/config.json')[env];
 const nodemailer = require("nodemailer");
 
 // Nodemailer SMTP 설정
@@ -7,7 +9,7 @@ const transporter = nodemailer.createTransport({
     secure: true,            // true: SSL 사용, false: TLS 사용
     auth: {
         user: "revecloud7@gmail.com",
-        pass: "obgm iunj nxvs uyvw",
+        pass: config.emailPass,
     },
 });
 
@@ -15,7 +17,6 @@ const transporter = nodemailer.createTransport({
 const sendEmailMiddleware = (req, res, next) => {
     const { to, subject, text, html } = req.body;
 
-    console.log(to,subject);
     // 필수 정보가 없으면 그냥 넘김 (이메일이 필수가 아닐 경우)
     if (!to || !subject || (!text && !html)) {
         return next();
@@ -42,4 +43,10 @@ const sendEmailMiddleware = (req, res, next) => {
     });
 };
 
+
+
+
+
 module.exports = sendEmailMiddleware;
+
+
