@@ -16,14 +16,20 @@ const config = require(__dirname + '/../config/config.json')[env];
 5. 특정 워크스페이스의 참여한 참여자 조회
 */
 
-// 협업 생성
+// 워크스페이스스 생성
 exports.postSpaceCreate = async (req, res) => {
   try {
+
+    // 워크스페이스 생성 시 패스워드 중복 조회
+
+
+
+
     const workSpace = await workSpaceModel.create({
       space_title: req.body.space_title,
       space_description: req.body.space_description,
       space_password: req.body.space_password,
-      user_id: req.body.user_id,
+      user_id: req.session.passport?.user?.user_id,
     });
     res.send(
       responseUtil('SUCCESS', '워크스페이스 생성 완료되었습니다.', {
@@ -35,7 +41,7 @@ exports.postSpaceCreate = async (req, res) => {
   }
 };
 
-// 특정 협업 조회
+// 특정 워크스페이스 조회
 exports.getSpace = async (req, res) => {
   try {
     const { space_id } = req.params;
@@ -53,10 +59,11 @@ exports.getSpace = async (req, res) => {
   }
 };
 
-// 개인별(내가가) 참여한 워크스페이스 전체 조회
+// 개인별(내가) 참여한 워크스페이스 전체 조회
 exports.getMySpace = async (req, res) => {
   try {
-    const { user_id } = req.query;
+    // 세션의 고유번호
+    const user_id = req.session.passport?.user?.user_id;
     const workSpaceMeber = await workSpaceMemberModel.findAll({
       where: {
         user_id: user_id,
@@ -68,7 +75,7 @@ exports.getMySpace = async (req, res) => {
     if (workSpaceMeber.length === 0) {
       return res.json({
         status: 'SUCCESS',
-        message: '참여한한 워크스페이스가 없습니다.',
+        message: '참여한 워크스페이스가 없습니다.',
         data: {},
       });
     }
@@ -90,7 +97,7 @@ exports.getMySpace = async (req, res) => {
       data: myWorkspcae,
     });
   } catch (err) {
-    console.log('getWorkSpace Controller Err:', error);
+    console.log('getWorkSpace Controller Err:', err);
     res.status(500).json({
       status: 'ERROR',
       message: '내가 참여한 협업 조회에 실패하였습니다.',
@@ -100,16 +107,7 @@ exports.getMySpace = async (req, res) => {
 };
 
 // 특정 워크스페이스에 참여한 참여자 전체 조회
-exports.postSpaceMember = async (req, res) => {
-  // 로그인체크
-  if (!req.isAuthenticated()) {
-    return res.json({
-      status: 'ERROR',
-      message: '로그인이 필요합니다.',
-      data: null,
-    });
-  }
-
+exports.getSpaceMember = async (req, res) => {
   try {
     const { space_id } = req.params;
 

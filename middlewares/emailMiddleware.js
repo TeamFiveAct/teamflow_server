@@ -1,3 +1,5 @@
+const env = 'localDev';
+const config = require(__dirname + '/../config/config.json')[env];
 const nodemailer = require("nodemailer");
 
 // Nodemailer SMTP 설정
@@ -7,7 +9,7 @@ const transporter = nodemailer.createTransport({
     secure: true,            // true: SSL 사용, false: TLS 사용
     auth: {
         user: "revecloud7@gmail.com",
-        pass: "avoy lgao qruw plwd",
+        pass: config.emailPass,
     },
 });
 

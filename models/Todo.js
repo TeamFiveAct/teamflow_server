@@ -45,6 +45,11 @@ const Todo = sequelize.define(
       allowNull: false,
       defaultValue: DataTypes.NOW,
     },
+    //소프트 딜리트 관련
+    is_deleted: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
     deleted_at: {
       type: DataTypes.DATEONLY,
       allowNull: true,
@@ -52,6 +57,7 @@ const Todo = sequelize.define(
   },
   {
     tableName: "todos",
+    paranoid: true, // 소프트 딜리트 활성화
     timestamps: false,
   }
 );
