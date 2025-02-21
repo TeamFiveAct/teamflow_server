@@ -13,10 +13,16 @@ router.post("/add", controller.postTodoCreate);
 router.post("/view/:todo_id", controller.postTodo);
 // 업무 수정
 router.patch("/:todo_id", controller.patchTodo);
-// 업무 삭제
+// 업무 소프트 삭제
 router.delete("/:todo_id", controller.deleteTodo);
+// 업무 하드 삭제
+router.delete("/permanent/:todo_id", controller.hardDeleteTodo);
+// 소프트 삭제 복구
+router.patch("/restore/:todo_id", controller.restoreTodo);
 // 업무 상태 변경
 router.patch("/state/:todo_id", controller.patchTodoState);
+// 소프트 딜리트된 업무 복구
+router.patch("/restore/:todo_id", controller.restoreTodo);
 
 module.exports = router;
 
