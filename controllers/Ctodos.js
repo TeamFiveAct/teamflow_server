@@ -86,21 +86,37 @@ exports.patchTodo = async (req, res) => {
 exports.deleteTodo = async (req, res) => {
   try {
     const { todo_id } = req.params;
-
     // 삭제 전 삭제할 데이터가 존재하는지 확인인
     const todo = await todoModel.findByPk(todo_id);
+
+    // 업무 참여자 삭제
+    await workerModel.destroy({
+      where: { todo_id: todo_id },
+    });
+
+    // todo 삭제
+    await todo.destroy();
+  
     if (!todo) {
-      return res.send(
-        responseUtil('ERROR', '해당 업무를 찾을 수 없습니다.', null)
-      );
+      return res.status(404).send({
+        status: "ERROR",
+        message: "해당 업무를 찾을 수 없습니다.",
+        data: null,
+      });
     }
 
-    // 해당 데이터 삭제 (기존 조회했던 데이터 기준으로 삭제)
-    await todo.destroy();
-    res.send(responseUtil('SUCCESS', '업무 삭제 성공했습니다.', null));
+    res.send({
+      status: "SUCCESS",
+      message: "업무 삭제 성공",
+      data: null,
+    });
   } catch (err) {
     console.error(err);
-    res.send(responseUtil('ERROR', '업무 삭제에 실패하였습니다.', null));
+    res.status(500).send({
+      status: "ERROR",
+      message: "업무 삭제에 실패하였습니다.",
+      data: null,
+    });
   }
 };
 
