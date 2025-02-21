@@ -1,6 +1,7 @@
 const express = require('express');
 const http = require('http');
 const path = require('path');
+const ejs = require('ejs');
 const fs = require('fs');
 const multer = require('multer');
 const { Server } = require('socket.io');
@@ -8,19 +9,35 @@ const session = require('express-session');
 const passport = require('./config/passport');
 const env = 'localDev';
 const cors = require('cors');
-//const env = 'development';
 const config = require('./config/config.json')[env];
-
 const db = require('./models'); // index.js에서 export 한 모든 모델
+const { swaggerUi, specs } = require('./swagger');
 
 const app = express();
 require('dotenv').config();
 const PORT = 8000;
 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+// swagger.yaml 파일 불러오기
+// const swaggerDocument = YAML.load('./swagger.yaml');
+
+// Swagger UI 미들웨어 등록
+//app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // JSON 요청 및 URL 인코딩된 요청 처리
 app.use(express.json());
-app.use(cors());
 app.use(express.urlencoded({ extended: true }));
+
+// CORS 미들웨어 (중복 호출 제거, 모든 라우트 전에 등록)
+app.use(
+  cors({
+    origin: 'http://localhost:3000', // 클라이언트 도메인 지정
+    credentials: true, // 쿠키와 인증정보 포함 허용
+  })
+);
+
+// EJS 설정
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
 // 세션 및 Passport 설정
 app.use(
@@ -29,7 +46,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      maxAge: 4 * 60 * 60 * 1000, // 세션 임시 4시간으로 설정
+      maxAge: 4 * 60 * 60 * 1000, // 세션 임시 4시간 설정
       secure: false,
       httpOnly: true,
     },
@@ -41,6 +58,7 @@ app.use(passport.session());
 
 // 라우터 로드
 const userRouter = require('./routes/user');
+const passwordRouter = require('./routes/password');
 const workspaceRouter = require('./routes/workspace');
 const todosRouter = require('./routes/todos');
 const uploadRouter = require('./routes/upload'); // 파일 업로드 라우터
@@ -60,6 +78,7 @@ app.get('/', (req, res) => {
 
 // 라우터 연결 (필요에 따라 경로 조정)
 app.use('/v1/user', userRouter);
+app.use('/v1/user', passwordRouter); // 비밀번호 재설정 라우트
 app.use('/v1/workspace', workspaceRouter);
 app.use('/v1/workspace/:space_id/todos', todosRouter);
 app.use('/upload', uploadRouter);
@@ -73,7 +92,7 @@ app.use((req, res) => {
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: '*', // 개발용. 배포 시 허용 도메인 지정
+    origin: '*', // Socket.io는 별도의 설정 (개발용, 배포 시 수정 필요)
   },
 });
 
@@ -82,5 +101,7 @@ chatSocket(io);
 
 // 서버 실행
 server.listen(PORT, () => {
-  console.log(`🚀 서버가 ${PORT} 포트에서 실행 중...`);
+  console.log(
+    `🚀 서버가 ${PORT} 포트에서 실행 중...API 문서는 http://localhost:${PORT}/api-docs 에서 확인하세요.`
+  );
 });

@@ -10,7 +10,6 @@ const transporter = nodemailer.createTransport({
     auth: {
         user: "revecloud7@gmail.com",
         pass: config.emailPass,
-    },
 });
 
 // 이메일 미들웨어
@@ -42,10 +41,6 @@ const sendEmailMiddleware = (req, res, next) => {
         next(); // 다음 미들웨어 실행
     });
 };
-
-
-
-
 
 module.exports = sendEmailMiddleware;
 

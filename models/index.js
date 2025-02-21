@@ -1,6 +1,7 @@
 // models/index.js
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
+
 const User = require('./User');
 const Workspace = require('./Workspace');
 const WorkspaceMember = require('./WorkspaceMember');
@@ -10,6 +11,7 @@ const Todo = require('./Todo');
 const Worker = require('./Worker');
 const Tag = require('./Tag');
 const TodoTags = require('./TodoTags');
+const PasswordReset = require('./PasswordReset'); // PasswordReset 모델 연결
 
 // ─────────────────────────────────────────────────────────
 // 1) User ↔ Workspace (1 : 1)
@@ -87,7 +89,6 @@ Todo.hasMany(Worker, {
 
 // ─────────────────────────────────────────────────────────
 // 7) Tags ↔ TodoTags ↔ Todo (N:M), 중간 테이블 TodoTags
-//
 // ─────────────────────────────────────────────────────────
 Todo.belongsToMany(Tag, {
   through: TodoTags,
@@ -103,17 +104,17 @@ Tag.belongsToMany(Todo, {
   as: 'Todos',
 });
 
-// console.log('DB_NAME:', process.env.DB_NAME);
-// console.log('DB_USER:', process.env.DB_USER);
-// console.log('DB_PASSWORD:', process.env.DB_PASSWORD ? '********' : 'Not Set');
-// console.log('DB_HOST:', process.env.DB_HOST);
-// console.log('DB_PORT:', process.env.DB_PORT);
-// console.log('DB_DIALECT:', process.env.DB_DIALECT);
+// ─────────────────────────────────────────────────────────
+// 8) PasswordReset ↔ User (N:1)
+// ─────────────────────────────────────────────────────────
+// PasswordReset 모델에서 associate 메서드를 사용해 관계를 설정할 수도 있음
+// 아래와 같이 직접 설정해줄 수 있습니다.
+PasswordReset.belongsTo(User, {
+  foreignKey: 'user_id',
+  as: 'user',
+});
 
-/**
- * 데이터베이스 동기화
- */
-// 테이블 만들기 위해서는 true로 하고 테이블 만들면 false로 바꿔주기
+// 데이터베이스 동기화
 sequelize.sync({ force: false }).then(() => {
   console.log('Database synced!');
 });
@@ -128,4 +129,5 @@ module.exports = {
   Todo,
   Worker,
   Tag,
+  PasswordReset,
 };
