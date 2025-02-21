@@ -5,6 +5,7 @@ const workSpaceMemberModel = require('../models/WorkspaceMember');
 const sendEmailMiddleware = require('../middlewares/emailMiddleware'); // 이메일 미들웨어
 const nodemailer = require('nodemailer');
 const responseUtil = require('../utils/ResponseUtil');
+const crypto = require("crypto");
 const env = 'localDev';
 const config = require(__dirname + '/../config/config.json')[env];
 
@@ -16,30 +17,69 @@ const config = require(__dirname + '/../config/config.json')[env];
 5. 특정 워크스페이스의 참여한 참여자 조회
 */
 
-// 워크스페이스스 생성
+// 워크스페이스 생성
 exports.postSpaceCreate = async (req, res) => {
   try {
-
-    // 워크스페이스 생성 시 패스워드 중복 조회
-
-
-
+    let uniquePassword = await generateUniqueCode();
 
     const workSpace = await workSpaceModel.create({
       space_title: req.body.space_title,
       space_description: req.body.space_description,
-      space_password: req.body.space_password,
+      space_password: uniquePassword, 
       user_id: req.session.passport?.user?.user_id,
     });
+
     res.send(
-      responseUtil('SUCCESS', '워크스페이스 생성 완료되었습니다.', {
-        space_password: req.body.space_password,
+      responseUtil("SUCCESS", "워크스페이스가 생성되었습니다.", {
+        space_password: uniquePassword,
       })
     );
   } catch (err) {
-    res.send(responseUtil('ERROR', '워크스페이스 생성에 실패하였습니다', null));
+    console.error(err);
+    res.send(responseUtil("ERROR", "워크스페이스 생성에 실패하였습니다.", null));
   }
 };
+
+// 고유한 암호화 패스워드 생성 (중복 확인 포함)
+async function generateUniqueCode() {
+  let isDuplicate = true;
+  let uniqueCode;
+
+  // 중복이 아닌 패스워드가 나올때 까지 반복
+  while (isDuplicate) {
+    //새로운 패스워드를 패스워드 생성함수로 부터 받아옴
+    uniqueCode = createPasswordCode();
+    //DB에 같은 패스워드 값이 있는지 중복확인
+    const existingSpace = await workSpaceModel.findOne({
+      where: { space_password: uniqueCode },
+    });
+
+    // DB 조회 반환값이 존재하지 않으면 재발급 중단
+    if (!existingSpace) {
+      isDuplicate = false;
+    }
+  }
+
+  return uniqueCode;
+}
+
+// 패스워드 생성함수 (현재 날짜와 랜덤 문자를 섞어서)
+function createPasswordCode() {
+  // 현재 시간을 36진수로 변환
+  const timestamp = Date.now().toString(36).toUpperCase(); 
+  // 6자리 랜덤 16진수
+  const randomBytes = crypto.randomBytes(3).toString("hex").toUpperCase(); 
+  return `${timestamp}-${randomBytes}`;
+}
+
+
+
+
+
+
+
+
+
 
 // 특정 워크스페이스 조회
 exports.getSpace = async (req, res) => {
