@@ -17,7 +17,6 @@ const transporter = nodemailer.createTransport({
 const sendEmailMiddleware = (req, res, next) => {
     const { to, subject, text, html } = req.body;
 
-    console.log(to,subject);
     // 필수 정보가 없으면 그냥 넘김 (이메일이 필수가 아닐 경우)
     if (!to || !subject || (!text && !html)) {
         return next();
@@ -45,3 +44,5 @@ const sendEmailMiddleware = (req, res, next) => {
 };
 
 module.exports = sendEmailMiddleware;
+
+
