@@ -53,7 +53,7 @@ const PasswordReset = sequelize.define(
   }
 );
 
-// Add association
+// 관계 삽입
 PasswordReset.associate = (models) => {
   PasswordReset.belongsTo(models.User, {
     foreignKey: 'user_id',
