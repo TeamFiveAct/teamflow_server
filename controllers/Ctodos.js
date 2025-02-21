@@ -1,6 +1,10 @@
-const todoModel = require('../models/Todo');
+
+
+const { where } = require("sequelize");
+const todoModel = require("../models/Todo");
+const workerModel = require("../models/Worker");
 const responseUtil = require('../utils/ResponseUtil');
-// const { errorlogs } = require("../utils/common");
+
 
 // 전체 업무 리스트
 exports.postTodoList = async (req, res) => {
@@ -45,7 +49,7 @@ exports.postTodo = async (req, res) => {
 exports.postTodoCreate = async (req, res) => {
   try {
     const todo = await todoModel.create({
-      space_id: req.body.space_id,
+      space_id: req.params.space_id,
       title: req.body.title,
       description: req.body.description,
       priority: req.body.priority,
@@ -86,21 +90,37 @@ exports.patchTodo = async (req, res) => {
 exports.deleteTodo = async (req, res) => {
   try {
     const { todo_id } = req.params;
-
     // 삭제 전 삭제할 데이터가 존재하는지 확인인
     const todo = await todoModel.findByPk(todo_id);
+
+    // 업무 참여자 삭제
+    await workerModel.destroy({
+      where: { todo_id: todo_id },
+    });
+
+    // todo 삭제
+    await todo.destroy();
+  
     if (!todo) {
-      return res.send(
-        responseUtil('ERROR', '해당 업무를 찾을 수 없습니다.', null)
-      );
+      return res.status(404).send({
+        status: "ERROR",
+        message: "해당 업무를 찾을 수 없습니다.",
+        data: null,
+      });
     }
 
-    // 해당 데이터 삭제 (기존 조회했던 데이터 기준으로 삭제)
-    await todo.destroy();
-    res.send(responseUtil('SUCCESS', '업무 삭제 성공했습니다.', null));
+    res.send({
+      status: "SUCCESS",
+      message: "업무 삭제 성공",
+      data: null,
+    });
   } catch (err) {
     console.error(err);
-    res.send(responseUtil('ERROR', '업무 삭제에 실패하였습니다.', null));
+    res.status(500).send({
+      status: "ERROR",
+      message: "업무 삭제에 실패하였습니다.",
+      data: null,
+    });
   }
 };
 
@@ -110,7 +130,7 @@ exports.patchTodoState = async (req, res) => {
     const { todo_id } = req.params;
     const { state } = req.body; // 변경할 상태 값
 
-    // 1️⃣ 해당 업무 찾기
+    // 해당 업무 찾기
     const todo = await todoModel.findByPk(todo_id);
     if (!todo) {
       return res.send(
@@ -118,9 +138,9 @@ exports.patchTodoState = async (req, res) => {
       );
     }
 
-    // 2️⃣ 상태 업데이트
+    // 상태 업데이트
     await todo.update({ state });
-    res.sed(
+    res.sned(
       responseUtil('SUCCESS', '업무 상태가 변경되었습니다.', {
         id: todo.id,
         state: todo.state,
