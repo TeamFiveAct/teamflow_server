@@ -18,11 +18,9 @@ exports.postJoin = async (req, res) => {
   try {
     const { email, password_hash, nickname, profile_image } = req.body;
     if (!email || !password_hash || !nickname || !profile_image) {
-      return res.send({
-        status: 'ERROR',
-        message: '이메일, 비번, 닉네임을 모두 입력해주세요.',
-        data: null,
-      });
+      return res.send(
+        responseUtil('ERROR', '이메일, 비번, 닉네임을 모두 입력해주세요.', null)
+      );
     }
     const existsEmail = await User.findOne({
       where: { email },
@@ -31,18 +29,16 @@ exports.postJoin = async (req, res) => {
 
     // 이미 탈퇴한 계정이라면
     if (existsEmail && existsEmail.deleted_at) {
-      return res.send({
-        status: 'ERROR',
-        message: '탈퇴한 계정입니다. 복구를 원하시면 관리자에게 문의하세요.',
-        data: null,
-      });
+      return res.send(
+        responseUtil(
+          'ERROR',
+          '탈퇴한 계정입니다. 복구를 원하시면 관리자에게 문의하세요.',
+          null
+        )
+      );
     }
     if (existsEmail) {
-      return res.send({
-        status: 'ERROR',
-        message: '이미 가입된 사용자 입니다.',
-        data: null,
-      });
+      return res.send(responseUtil('ERROR', '이미 가입된 사용자입니다.', null));
     }
     const hasedPassword = await bcrypt.hash(password_hash, 10);
     const newUser = await User.create({
@@ -52,7 +48,6 @@ exports.postJoin = async (req, res) => {
       auth_provider: 'email',
       profile_image,
     });
-
     return res.send(
       responseUtil('SUCCESS', '회원가입이 성공되었습니다.', {
         nickname: newUser.nickname,
@@ -60,11 +55,7 @@ exports.postJoin = async (req, res) => {
     );
   } catch (err) {
     console.log('error', err);
-    return res.send({
-      status: 'ERROR',
-      message: '서버 오류가 발생했습니다.',
-      data: null,
-    });
+    return res.send(responseUtil('ERROR', '서버 오류가 발생했습니다.', null));
   }
 };
 
@@ -77,24 +68,14 @@ exports.getCheckName = async (req, res) => {
     });
     console.log(existName);
     if (existName) {
-      return res.send({
-        status: 'ERROR',
-        message: '중복된 닉네임이 존재합니다.',
-        data: null,
-      });
+      return res.send(
+        responseUtil('ERROR', '중복된 닉네임이 존재합니다.', null)
+      );
     }
-    return res.send({
-      status: 'SUCCESS',
-      message: '사용가능한 닉네임입니다.',
-      data: null,
-    });
+    return res.send(responseUtil('SUCCESS', '사용가능한 닉네임입니다.', null));
   } catch (err) {
     console.log('error', err);
-    return res.send({
-      status: 'ERROR',
-      message: '서버 오류가 발생했습니다.',
-      data: null,
-    });
+    return res.send(responseUtil('ERROR', '서버 오류가 발생했습니다.', null));
   }
 };
 
@@ -104,24 +85,14 @@ exports.getCheckEmail = async (req, res) => {
     const { email } = req.query;
     const existEmail = await User.findOne({ where: { email } });
     if (existEmail) {
-      return res.send({
-        status: 'ERROR',
-        message: '중복된 이메일이 존재합니다.',
-        data: null,
-      });
+      return res.send(
+        responseUtil('ERROR', '중복된 이메일이 존재합니다.', null)
+      );
     }
-    return res.send({
-      status: 'SUCCESS',
-      message: '사용가능한 이메일입니다.',
-      data: null,
-    });
+    return res.send(responseUtil('SUCCESS', '사용가능한 이메일입니다.', null));
   } catch (err) {
     console.log('error', err);
-    return res.send({
-      status: 'ERROR',
-      message: '서버 오류가 발생했습니다.',
-      data: null,
-    });
+    return res.send(responseUtil('ERROR', '서버 오류가 발생했습니다.', null));
   }
 };
 
@@ -130,11 +101,9 @@ exports.postLogin = (req, res, next) => {
   passport.authenticate('local', async (err, user, info) => {
     if (err) return next(err);
     if (!user) {
-      return res.send({
-        status: 'ERROR',
-        message: info.message || '로그인 실패했습니다.',
-        data: null,
-      });
+      return res.send(
+        responseUtil('ERROR', info.message || '로그인 실패했습니다.', null)
+      );
     }
 
     const userData = await User.findOne({
@@ -143,23 +112,25 @@ exports.postLogin = (req, res, next) => {
     });
 
     if (userData && userData.deleted_at) {
-      return res.send({
-        status: 'ERROR',
-        message: '탈퇴한 회원입니다. 복구를 원하시면 관리자에게 문의하세요.',
-        data: null,
-      });
+      return res.send(
+        responseUtil(
+          'ERROR',
+          '탈퇴한 회원입니다. 복구를 원하시면 관리자에게 문의하세요.',
+          null
+        )
+      );
     }
 
     req.login(user, (loginInErr) => {
       if (loginInErr) return next(loginInErr);
 
-      console.log('이메일 로그인 현재 세션:', req.session); // 세션 확인
+      //console.log('이메일 로그인 현재 세션:', req.session); // 세션 확인
 
-      return res.send({
-        status: 'SUCCESS',
-        message: '로그인 성공했습니다.',
-        data: { nickname: user.nickname },
-      });
+      return res.send(
+        responseUtil('SUCCESS', '로그인 성공했습니다.', {
+          nickname: user.nickname,
+        })
+      );
     });
   })(req, res, next);
 };
@@ -176,11 +147,7 @@ exports.getKakaoCallback = (req, res, next) => {
       return next(err);
     }
     if (!user) {
-      return res.send({
-        status: 'ERROR',
-        message: '로그인 실패했습니다.',
-        data: null,
-      });
+      return res.send(responseUtil('ERROR', '로그인 실패했습니다.', null));
     }
 
     req.login(user, (loginErr) => {
@@ -191,11 +158,11 @@ exports.getKakaoCallback = (req, res, next) => {
       req.session.save((err) => {
         if (err) return next(err);
 
-        return res.send({
-          status: 'SUCCESS',
-          message: '카카오 로그인 성공!',
-          data: { nickname: user.nickname },
-        });
+        return res.send(
+          responseUtil('SUCCESS', '카카오 로그인에 성공했습니다.', {
+            nickname: user.nickname,
+          })
+        );
       });
     });
   })(req, res, next);
@@ -209,11 +176,7 @@ exports.postLogout = (req, res) => {
       if (sessionErr) return next(sessionErr);
 
       res.clearCookie('connect.sid');
-      return res.send({
-        status: 'SUCCESS',
-        message: '로그아웃 성공했습니다.',
-        data: null,
-      });
+      return res.send(responseUtil('SUCCESS', '로그아웃 성공했습니다.', null));
     });
   });
 };
@@ -223,21 +186,15 @@ exports.postKakaoLogout = async (req, res, next) => {
   console.log('로그아웃 전 세션 확인', req.session);
   try {
     if (!req.session.passport || !req.session.passport.user) {
-      return res.send({
-        status: 'ERROR',
-        message: '로그인 상태가 아닙니다.',
-        data: null,
-      });
+      return res.send(responseUtil('ERROR', '로그인 상태가 아닙니다.', null));
     }
 
     const accessToken = req.session.passport.user.access_token;
 
     if (!accessToken) {
-      return res.send({
-        status: 'ERROR',
-        message: '액세스 토큰이 존재하지 않습니다.',
-        data: null,
-      });
+      return res.send(
+        responseUtil('ERROR', '액세스 토큰이 존재하지 않습니다.', null)
+      );
     }
 
     // 1. 카카오 API에 로그아웃 요청
@@ -253,20 +210,15 @@ exports.postKakaoLogout = async (req, res, next) => {
         if (sessionErr) return next(sessionErr);
 
         res.clearCookie('connect.sid');
-
-        return res.send({
-          status: 'SUCCESS',
-          message: '카카오 로그아웃 성공했습니다.',
-          data: null,
-        });
+        return res.send(
+          responseUtil('SUCCESS', '카카오 로그아웃 성공했습니다.', null)
+        );
       });
     });
   } catch (err) {
-    return res.send({
-      status: 'ERROR',
-      message: '카카오 로그아웃 실패했습니다.',
-      error: err.message,
-    });
+    return res.send(
+      responseUtil('ERROR', '카카오 로그아웃 실패했습니다.', null)
+    );
   }
 };
 
@@ -275,22 +227,16 @@ exports.getUserInfo = async (req, res) => {
   try {
     // 로그인 상태 확인
     if (!req.session.passport || !req.session.passport.user) {
-      return res.send({
-        status: 'ERROR',
-        message: '로그인 상태가 아닙니다.',
-        data: null,
-      });
+      return res.send(responseUtil('ERROR', '로그인 상태가 아닙니다.', null));
     }
 
     const { user_id } = req.session.passport.user;
     const user = await User.findOne({ where: { user_id } });
 
     if (!user) {
-      return res.send({
-        status: 'ERROR',
-        message: '사용자 정보를 찾을 수 없습니다.',
-        data: null,
-      });
+      return res.send(
+        responseUtil('ERROR', '사용자 정보를 찾을 수 없습니다.', null)
+      );
     }
 
     // 민감한 정보는 제외하고 사용자 정보를 반환합니다.
@@ -302,10 +248,8 @@ exports.getUserInfo = async (req, res) => {
       kakao_id,
       created_at,
     } = user;
-    return res.send({
-      status: 'SUCCESS',
-      message: '사용자 정보 조회 성공.',
-      data: {
+    return res.send(
+      responseUtil('SUCCESS', '정보 조회에 성공했습니다.', {
         user_id,
         email,
         nickname,
@@ -313,15 +257,11 @@ exports.getUserInfo = async (req, res) => {
         auth_provider,
         kakao_id,
         created_at,
-      },
-    });
+      })
+    );
   } catch (err) {
     console.log('getUserInfo error:', err);
-    return res.send({
-      status: 'ERROR',
-      message: '서버 오류가 발생했습니다.',
-      data: null,
-    });
+    return res.send(responseUtil('ERROR', '서버 오류가 발생했습니다.', null));
   }
 };
 
@@ -330,21 +270,15 @@ exports.updateUserInfo = async (req, res) => {
   try {
     // 로그인 상태 확인
     if (!req.session.passport || !req.session.passport.user) {
-      return res.send({
-        status: 'ERROR',
-        message: '로그인 상태가 아닙니다.',
-        data: null,
-      });
+      return res.send(responseUtil('ERROR', '로그인 상태가 아닙니다.', null));
     }
 
     const { user_id } = req.session.passport.user;
     const user = await User.findOne({ where: { user_id } });
     if (!user) {
-      return res.send({
-        status: 'ERROR',
-        message: '사용자 정보를 찾을 수 없습니다.',
-        data: null,
-      });
+      return res.send(
+        responseUtil('ERROR', '사용자 정보를 찾을 수 없습니다.', null)
+      );
     }
 
     // 클라이언트로부터 수정할 필드를 받아옵니다.
@@ -358,11 +292,9 @@ exports.updateUserInfo = async (req, res) => {
         where: { email, user_id: { [Op.ne]: user_id } },
       });
       if (emailExists) {
-        return res.send({
-          status: 'ERROR',
-          message: '이미 사용중인 이메일입니다.',
-          data: null,
-        });
+        return res.send(
+          responseUtil('ERROR', '이미 사용중인 이메일입니다.', null)
+        );
       }
       updateData.email = email;
     }
@@ -375,11 +307,9 @@ exports.updateUserInfo = async (req, res) => {
         ),
       });
       if (nicknameExists) {
-        return res.send({
-          status: 'ERROR',
-          message: '이미 사용중인 닉네임입니다.',
-          data: null,
-        });
+        return res.send(
+          responseUtil('ERROR', '이미 사용중인 닉네임입니다.', null)
+        );
       }
       updateData.nickname = nickname;
     }
@@ -397,27 +327,20 @@ exports.updateUserInfo = async (req, res) => {
 
     // 업데이트할 내용이 없는 경우
     if (Object.keys(updateData).length === 0) {
-      return res.send({
-        status: 'SUCCESS',
-        message: '변경사항이 없습니다.',
-        data: null,
-      });
+      return res.send(responseUtil('SUCCESS', '변경사항이 없습니다.', null));
     }
 
     await user.update(updateData);
-
-    return res.send({
-      status: 'SUCCESS',
-      message: '사용자 정보가 성공적으로 업데이트되었습니다.',
-      data: updateData,
-    });
+    return res.send(
+      responseUtil(
+        'SUCCESS',
+        '사용자 정보가 성공적으로 업데이트되었습니다.',
+        updateData
+      )
+    );
   } catch (err) {
     console.log('updateUserInfo error:', err);
-    return res.send({
-      status: 'ERROR',
-      message: '서버 오류가 발생했습니다.',
-      data: null,
-    });
+    return res.send(responseUtil('ERROR', '서버 오류가 발생했습니다.', null));
   }
 };
 
@@ -433,22 +356,16 @@ exports.getSession = (req, res) => {
 exports.deleteMyInfo = async (req, res) => {
   try {
     if (!req.session.passport || !req.session.passport.user) {
-      return res.send({
-        status: 'ERROR',
-        message: '로그인 상태가 아닙니다.',
-        data: null,
-      });
+      return res.send(responseUtil('ERROR', '로그인 상태가 아닙니다.', null));
     }
 
     const { user_id: userId } = req.session.passport.user;
 
     const user = await User.findOne({ where: { user_id: userId } });
     if (!user) {
-      return res.status.send({
-        status: 'ERROR',
-        message: '사용자를 찾을 수 없습니다.',
-        data: null,
-      });
+      return res.send(
+        responseUtil('ERROR', '사용자를 찾을 수 없습니다.', null)
+      );
     }
 
     if (user.auth_provider === 'email') {
@@ -464,11 +381,9 @@ exports.deleteMyInfo = async (req, res) => {
       const accessToken = req.session.passport.user.access_token;
 
       if (!accessToken) {
-        return res.send({
-          status: 'ERROR',
-          message: '카카오 액세스 토큰을 찾을 수 없습니다.',
-          data: null,
-        });
+        return res.send(
+          responseUtil('ERROR', '카카오 액세스 토큰을 찾을 수 없습니다.', null)
+        );
       }
 
       await axios.post('https://kapi.kakao.com/v1/user/unlink', null, {
@@ -484,17 +399,10 @@ exports.deleteMyInfo = async (req, res) => {
       );
     }
 
-    return res.send({
-      status: 'ERROR',
-      message: '알수 없는 인증입니다.',
-    });
+    return res.send(responseUtil('ERROR', '알수 없는 인증입니다.', null));
   } catch (err) {
     console.log('err', err);
-    res.send({
-      status: 'ERROR',
-      message: '서버 오류가 발생했습니다.',
-      data: null,
-    });
+    return res.send(responseUtil('ERROR', '서버 오류가 발생했습니다.', null));
   }
 };
 
@@ -502,23 +410,16 @@ exports.deleteMyInfo = async (req, res) => {
 const logoutAndDestroySession = (req, res, successMessage) => {
   req.logout((err) => {
     if (err)
-      return res.send({
-        status: 'ERROR',
-        message: '로그아웃 중 오류가 발생했습니다.',
-      });
+      return res.send(
+        responseUtil('ERROR', '로그아웃 중 오류가 발생했습니다.', null)
+      );
 
     req.session.destroy((sessionErr) => {
       if (sessionErr)
-        return res.send({
-          status: 'ERROR',
-          message: '세션 삭제 실패했습니다.',
-        });
+        return res.send(responseUtil('ERROR', '세션 삭제 실패했습니다.', null));
 
       res.clearCookie('connect.sid');
-      return res.send({
-        status: 'SUCCESS',
-        message: successMessage,
-      });
+      return res.send(responseUtil('SUCCESS', successMessage, null));
     });
   });
 };
