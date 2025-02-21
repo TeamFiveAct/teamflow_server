@@ -347,7 +347,10 @@ exports.updateUserInfo = async (req, res) => {
 // 현재 로그인한 사용자 세션 확인 GET /v1/user/session
 exports.getSession = (req, res) => {
   console.log(req.session);
-  res.send({ message: req.session });
+  if (req.session.passport) {
+    return res.send(responseUtil('SUCCESS', '세션이 존재합니다.', null));
+  }
+  return res.send(responseUtil('ERROR', '세션이 없습니다.', null));
 };
 
 // 회원탈퇴 DELETE /v1/user
