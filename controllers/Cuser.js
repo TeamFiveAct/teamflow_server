@@ -6,7 +6,9 @@ const User = require('../models/User');
 const passport = require('passport');
 const axios = require('axios');
 const { Op, Sequelize } = require('sequelize');
+const responseUtil = require('../utils/ResponseUtil');
 
+// 테스트 API
 exports.getTest = (req, res) => {
   res.send({ message: 'test' });
 };
@@ -15,10 +17,6 @@ exports.getTest = (req, res) => {
 exports.postJoin = async (req, res) => {
   try {
     const { email, password_hash, nickname, profile_image } = req.body;
-    console.log(email);
-    console.log(password_hash);
-    console.log(nickname);
-    console.log(profile_image);
     if (!email || !password_hash || !nickname || !profile_image) {
       return res.send({
         status: 'ERROR',
@@ -55,11 +53,11 @@ exports.postJoin = async (req, res) => {
       profile_image,
     });
 
-    return res.send({
-      status: 'SUCCESS',
-      message: '회원가입이 성공되었습니다.',
-      data: { nickname: newUser.nickname },
-    });
+    return res.send(
+      responseUtil('SUCCESS', '회원가입이 성공되었습니다.', {
+        nickname: newUser.nickname,
+      })
+    );
   } catch (err) {
     console.log('error', err);
     return res.send({
@@ -272,9 +270,6 @@ exports.postKakaoLogout = async (req, res, next) => {
   }
 };
 
-
-//유저정보조회
-
 // 사용자 정보 조회 GET /v1/user/info
 exports.getUserInfo = async (req, res) => {
   try {
@@ -299,11 +294,26 @@ exports.getUserInfo = async (req, res) => {
     }
 
     // 민감한 정보는 제외하고 사용자 정보를 반환합니다.
-    const { email, nickname, profile_image, auth_provider, kakao_id, created_at } = user;
+    const {
+      email,
+      nickname,
+      profile_image,
+      auth_provider,
+      kakao_id,
+      created_at,
+    } = user;
     return res.send({
       status: 'SUCCESS',
       message: '사용자 정보 조회 성공.',
-      data: { user_id, email, nickname, profile_image, auth_provider, kakao_id, created_at },
+      data: {
+        user_id,
+        email,
+        nickname,
+        profile_image,
+        auth_provider,
+        kakao_id,
+        created_at,
+      },
     });
   } catch (err) {
     console.log('getUserInfo error:', err);
@@ -314,7 +324,6 @@ exports.getUserInfo = async (req, res) => {
     });
   }
 };
-
 
 // 사용자 정보 수정 PUT /v1/user/info
 exports.updateUserInfo = async (req, res) => {
@@ -361,7 +370,9 @@ exports.updateUserInfo = async (req, res) => {
     // 닉네임 수정 시 중복 체크 (BINARY 비교, 현재 사용자는 제외)
     if (nickname && nickname !== user.nickname) {
       const nicknameExists = await User.findOne({
-        where: Sequelize.literal(`BINARY nickname = '${nickname}' AND user_id != ${user_id}`),
+        where: Sequelize.literal(
+          `BINARY nickname = '${nickname}' AND user_id != ${user_id}`
+        ),
       });
       if (nicknameExists) {
         return res.send({
