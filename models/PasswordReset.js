@@ -21,7 +21,7 @@ const PasswordReset = sequelize.define(
     token: {
       type: DataTypes.STRING(64),
       allowNull: false,
-      unique: true,
+      unique: true, // 여기서 인덱스 생성됨
     },
     expires_at: {
       type: DataTypes.DATE,
@@ -41,19 +41,14 @@ const PasswordReset = sequelize.define(
   {
     tableName: 'password_resets',
     timestamps: false,
+    // indexes 옵션에서 token 인덱스 제거
     indexes: [
-      {
-        unique: true,
-        fields: ['token'],
-      },
-      {
-        fields: ['user_id'],
-      },
+      // user_id 인덱스도 MySQL이 자동 생성할 수 있으므로 제거하거나 주석 처리합니다.
+      // { fields: ['user_id'] },
     ],
   }
 );
 
-// 관계 삽입
 PasswordReset.associate = (models) => {
   PasswordReset.belongsTo(models.User, {
     foreignKey: 'user_id',

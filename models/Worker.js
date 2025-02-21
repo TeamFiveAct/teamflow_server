@@ -1,9 +1,9 @@
 // models/Worker.js
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database"); // 경로 수정
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database'); // 경로 수정
 
 const Worker = sequelize.define(
-  "Worker",
+  'Worker',
   {
     worker_id: {
       type: DataTypes.BIGINT,
@@ -29,7 +29,7 @@ const Worker = sequelize.define(
     },
   },
   {
-    tableName: "worker", // 혹은 'workers'
+    tableName: 'worker', // 혹은 'workers'
     paranoid: true, // 소프트 딜리트 활성화
     timestamps: false,
   }
