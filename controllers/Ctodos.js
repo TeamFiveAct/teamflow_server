@@ -1,6 +1,10 @@
-const todoModel = require('../models/Todo');
+
+
+const { where } = require("sequelize");
+const todoModel = require("../models/Todo");
+const workerModel = require("../models/Worker");
 const responseUtil = require('../utils/ResponseUtil');
-// const { errorlogs } = require("../utils/common");
+
 
 // 전체 업무 리스트
 exports.postTodoList = async (req, res) => {
@@ -45,7 +49,7 @@ exports.postTodo = async (req, res) => {
 exports.postTodoCreate = async (req, res) => {
   try {
     const todo = await todoModel.create({
-      space_id: req.body.space_id,
+      space_id: req.params.space_id,
       title: req.body.title,
       description: req.body.description,
       priority: req.body.priority,
@@ -126,7 +130,7 @@ exports.patchTodoState = async (req, res) => {
     const { todo_id } = req.params;
     const { state } = req.body; // 변경할 상태 값
 
-    // 1️⃣ 해당 업무 찾기
+    // 해당 업무 찾기
     const todo = await todoModel.findByPk(todo_id);
     if (!todo) {
       return res.send(
@@ -134,9 +138,9 @@ exports.patchTodoState = async (req, res) => {
       );
     }
 
-    // 2️⃣ 상태 업데이트
+    // 상태 업데이트
     await todo.update({ state });
-    res.sed(
+    res.sned(
       responseUtil('SUCCESS', '업무 상태가 변경되었습니다.', {
         id: todo.id,
         state: todo.state,

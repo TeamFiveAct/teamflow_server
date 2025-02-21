@@ -100,7 +100,7 @@ exports.getMySpace = async (req, res) => {
 };
 
 // 특정 워크스페이스에 참여한 참여자 전체 조회
-exports.postSpaceMember = async (req, res) => {
+exports.getSpaceMember = async (req, res) => {
   // 로그인체크
   if (!req.isAuthenticated()) {
     return res.json({
@@ -221,15 +221,6 @@ exports.postSpaceJoin = async (req, res) => {
     return res.send(responseUtil('ERROR', '서버 오류가 발생했습니다.', null));
   }
 };
-
-// 이메일 발송을 위한 Nodemailer 설정
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'revecloud7@gmail.com',
-    pass: config.emailPass,
-  },
-});
 
 // 협업초대 메일발송
 exports.postSpaceInvite = async (req, res, next) => {

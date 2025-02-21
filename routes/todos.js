@@ -18,6 +18,5 @@ router.delete("/:todo_id", controller.deleteTodo);
 // 업무 상태 변경
 router.patch("/state/:todo_id", controller.patchTodoState);
 
-
 module.exports = router;
 
