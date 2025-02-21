@@ -18,10 +18,20 @@ const WorkspaceMember = sequelize.define(
       type: DataTypes.BIGINT,
       allowNull: false, // FK (users.user_id)
     },
+    //소프트 딜리트 관련
+    is_deleted: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    deleted_at: {
+      type: DataTypes.DATEONLY,
+      allowNull: true,
+    },
   },
   {
     tableName: "workspace_member",
     timestamps: false,
+    paranoid: true,
   }
 );
 
