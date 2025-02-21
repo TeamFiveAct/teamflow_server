@@ -208,7 +208,7 @@ exports.restoreTodo = async (req, res) => {
       status: "SUCCESS",
       message: "업무가 복구되었습니다.",
 
-    }
+    })
   } catch (err) {
     console.error(err);
     res.status(500).send({
