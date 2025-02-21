@@ -1,0 +1,136 @@
+openapi: 3.0.0
+info:
+  title: User API
+  version: '1.0.0'
+servers:
+  - url: http://localhost:8000
+paths:
+  /v1/user/request-reset:
+    post:
+      summary: '비밀번호 리셋 요청'
+      description: '사용자 이메일을 받아 비밀번호 리셋 요청을 보냅니다.'
+      requestBody:
+        description: '비밀번호 리셋을 위한 사용자 이메일'
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: kyj002002@naver.com
+      responses:
+        '200':
+          description: '리셋 요청이 정상적으로 처리됨'
+        '400':
+          description: '잘못된 요청'
+  /v1/user/join:
+    post:
+      summary: '회원가입'
+      description: '새로운 사용자를 등록합니다.'
+      requestBody:
+        description: '회원가입을 위한 사용자 정보'
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: kyj002002@naver.com
+                password_hash:
+                  type: string
+                  example: test1234
+                nickname:
+                  type: string
+                  example: 테스트유저
+                profile_image:
+                  type: string
+                  example: profile.jpg
+      responses:
+        '200':
+          description: '회원가입 성공'
+        '400':
+          description: '잘못된 요청 또는 중복된 사용자'
+  /v1/user/login:
+    post:
+      summary: '로그인'
+      description: '사용자 인증을 진행합니다. 성공 시 쿠키에 세션 정보를 저장합니다.'
+      requestBody:
+        description: '로그인을 위한 사용자 이메일과 비밀번호'
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: kyj002002@naver.com
+                password_hash:
+                  type: string
+                  example: asd123
+      responses:
+        '200':
+          description: '로그인 성공 및 쿠키 발행'
+        '401':
+          description: '인증 실패'
+  /v1/user/info:
+    get:
+      summary: '로그인 쿠키로 아이디 정보 조회'
+      description: '쿠키에 저장된 세션 정보를 기반으로 사용자 정보를 조회합니다.'
+      parameters:
+        - name: Cookie
+          in: header
+          description: '세션 정보가 담긴 쿠키'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: '사용자 정보 조회 성공'
+        '401':
+          description: '인증 실패'
+    put:
+      summary: '쿠키로 아이디 정보 수정'
+      description: '쿠키에 저장된 세션 정보를 사용해 사용자 정보를 수정합니다.'
+      parameters:
+        - name: Cookie
+          in: header
+          description: '세션 정보가 담긴 쿠키'
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: '수정할 사용자 정보'
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: newemail@example.com
+                nickname:
+                  type: string
+                  example: newnickname
+                profile_image:
+                  type: string
+                  example: http://example.com/new-profile.png
+                password:
+                  type: string
+                  example: newpassword
+      responses:
+        '200':
+          description: '사용자 정보 수정 성공'
+        '400':
+          description: '잘못된 요청'
+        '401':
+          description: '인증 실패'

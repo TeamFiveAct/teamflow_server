@@ -10,13 +10,18 @@ const passport = require('./config/passport');
 const env = 'localDev';
 const cors = require('cors');
 const config = require('./config/config.json')[env];
-
+const swaggerUi = require('swagger-ui-express');
 const db = require('./models'); // index.js에서 export 한 모든 모델
+const YAML = require('yamljs');
 
 const app = express();
 require('dotenv').config();
 const PORT = 8000;
+// swagger.yaml 파일 불러오기
+const swaggerDocument = YAML.load('./swagger.yaml');
 
+// Swagger UI 미들웨어 등록
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // JSON 요청 및 URL 인코딩된 요청 처리
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
