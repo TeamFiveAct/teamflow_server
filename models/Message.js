@@ -1,6 +1,6 @@
 // models/Message.js
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database'); // 경로 수정
+const sequelize = require('../config/database');
 
 const Message = sequelize.define(
   'Message',
@@ -10,13 +10,15 @@ const Message = sequelize.define(
       primaryKey: true,
       autoIncrement: true,
     },
-    room_id: {
+    // 기존 room_id를 workspace_id로 변경하여 해당 워크스페이스의 채팅방임을 명시
+    workspace_id: {
       type: DataTypes.BIGINT,
-      allowNull: false, // FK (chat_rooms.room_id)
+      allowNull: false,
     },
-    mem_id: {
+    // 기존 mem_id를 user_id로 변경
+    user_id: {
       type: DataTypes.BIGINT,
-      allowNull: false, // FK (workspace_members.mem_id)
+      allowNull: false,
     },
     content: {
       type: DataTypes.TEXT,

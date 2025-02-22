@@ -101,12 +101,12 @@ async function seed() {
       })
     );
 
-    // 4. 각 워크스페이스에 채팅방(ChatRoom) 생성 (소유자 user_id 사용)
+    // 4. 각 워크스페이스에 채팅방(ChatRoom) 생성
+    // 새 모델 구조에서는 ChatRoom이 workspace_id 필드만을 가집니다.
     const chatRooms = await Promise.all(
       workspaces.map((ws) =>
         ChatRoom.create({
-          space_id: ws.space_id,
-          user_id: ws.user_id,
+          workspace_id: ws.space_id,
         })
       )
     );
@@ -114,18 +114,18 @@ async function seed() {
     // 5. 각 채팅방에 메시지(Message) 생성
     const messages = [];
     for (const chatRoom of chatRooms) {
-      // 해당 채팅방의 워크스페이스 멤버 조회
+      // 해당 채팅방의 워크스페이스 멤버 조회 (WorkspaceMember 모델의 space_id 사용)
       const wsMembers = await WorkspaceMember.findAll({
-        where: { space_id: chatRoom.space_id },
+        where: { space_id: chatRoom.workspace_id },
       });
       // 각 채팅방마다 2개의 메시지 생성 (순환하여 멤버 선택)
       for (let i = 0; i < 2; i++) {
         const member = wsMembers[i % wsMembers.length];
         messages.push(
           await Message.create({
-            room_id: chatRoom.room_id,
-            mem_id: member.mem_id,
-            content: `Hello from member ${member.mem_id} in room ${chatRoom.room_id}`,
+            workspace_id: chatRoom.workspace_id,
+            user_id: member.user_id,
+            content: `Hello from user ${member.user_id} in workspace ${chatRoom.workspace_id}`,
             content_type: 'text',
           })
         );
