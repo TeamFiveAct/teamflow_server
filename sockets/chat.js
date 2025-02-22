@@ -1,32 +1,79 @@
+// sockets/chat.js
+const { Message, ChatRoom, WorkspaceMember } = require('../models');
+
 module.exports = (io) => {
   io.on('connection', (socket) => {
     console.log('Socket Connected:', socket.id);
 
-    // 채팅방 입장
-    socket.on('joinRoom', ({ mem_id, room_id }) => {
-      socket.join(room_id);
-      console.log(`mem_id=${mem_id} 님이 room_id=${room_id}에 입장`);
+    // 채팅방 입장 – user_id와 workspace_id를 이용하여 그룹 채팅방에 입장
+    socket.on('joinRoom', async ({ user_id, workspace_id }) => {
+      // 워크스페이스 멤버 여부 확인
+      try {
+        const member = await WorkspaceMember.findOne({
+          where: { user_id, space_id: workspace_id }
+        });
+        if (!member) {
+          socket.emit('error', '해당 workspace의 멤버가 아닙니다.');
+          return;
+        }
+      } catch (err) {
+        console.error('멤버 확인 중 오류:', err);
+        socket.emit('error', '멤버 확인 중 오류가 발생했습니다.');
+        return;
+      }
+
+      // 해당 workspace에 대응하는 채팅방이 존재하는지 확인
+      try {
+        const chatRoom = await ChatRoom.findOne({ where: { workspace_id } });
+        if (!chatRoom) {
+          socket.emit('error', '해당 workspace에 대한 채팅방이 존재하지 않습니다.');
+          return;
+        }
+      } catch (err) {
+        console.error('채팅방 확인 중 오류:', err);
+        socket.emit('error', '채팅방 확인 중 오류가 발생했습니다.');
+        return;
+      }
+
+      // workspace_id를 문자열로 변환하여 room 식별자로 사용
+      socket.join(workspace_id.toString());
+      console.log(`user_id=${user_id} 님이 workspace_id=${workspace_id} 채팅방에 입장`);
+
+      // 과거 채팅 기록 불러오기 (생성순 ASC)
+      try {
+        const messages = await Message.findAll({
+          where: { workspace_id },
+          order: [['created_at', 'ASC']]
+        });
+        socket.emit('chatHistory', messages);
+      } catch (error) {
+        console.error('채팅 기록 로딩 중 오류:', error);
+      }
     });
 
-    // 메시지 전송 (브로드캐스트)
-    socket.on(
-      'sendMessage',
-      ({ mem_id, room_id, content, content_type = 'text' }) => {
-        const messageObj = {
-          mem_id,
-          room_id,
-          content,
-          content_type,
-          created_at: new Date(),
-        };
-        io.to(room_id).emit('receiveMessage', messageObj);
+    // 메시지 전송 (브로드캐스트) – user_id와 workspace_id를 이용
+    socket.on('sendMessage', async ({ user_id, workspace_id, content, content_type = 'text' }) => {
+      const messageObj = {
+        user_id,
+        workspace_id,
+        content,
+        content_type,
+        created_at: new Date(),
+      };
+      try {
+        // 메시지를 DB에 저장
+        const savedMessage = await Message.create(messageObj);
+        // 해당 워크스페이스의 채팅방에 메시지 브로드캐스트
+        io.to(workspace_id.toString()).emit('receiveMessage', savedMessage);
+      } catch (error) {
+        console.error('메시지 전송 중 오류:', error);
       }
-    );
+    });
 
-    // 방 나가기
-    socket.on('leaveRoom', ({ room_id }) => {
-      socket.leave(room_id);
-      console.log(`Socket ${socket.id} 님이 room_id=${room_id}에서 퇴장`);
+    // 채팅방 퇴장
+    socket.on('leaveRoom', ({ workspace_id }) => {
+      socket.leave(workspace_id.toString());
+      console.log(`Socket ${socket.id} 님이 workspace_id=${workspace_id} 채팅방에서 퇴장`);
     });
 
     // 연결 해제
