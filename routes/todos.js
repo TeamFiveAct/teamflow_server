@@ -16,7 +16,7 @@ router.patch("/:todo_id", controller.patchTodo);
 // 업무 소프트 삭제
 router.delete("/:todo_id", controller.deleteTodo);
 // 업무 하드 삭제
-router.delete("/permanent/:todo_id", controller.hardDeleteTodo);
+router.delete("/permanent/:todo_id", controller.deleteHardDeleteTodo);
 // 소프트 삭제 복구
 router.patch("/restore/:todo_id", controller.restoreTodo);
 // 업무 상태 변경
