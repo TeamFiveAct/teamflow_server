@@ -22,10 +22,17 @@ exports.postSpaceCreate = async (req, res) => {
   try {
     let uniquePassword = await generateUniqueCode();
 
+    // 워크스페이스 생성성
     const workSpace = await workSpaceModel.create({
       space_title: req.body.space_title,
       space_description: req.body.space_description,
       space_password: uniquePassword, 
+      user_id: req.session.passport?.user?.user_id,
+    });
+
+    // 생성한 워크스페이스에 생성자 추가가
+    const workSpaceMember = await workSpaceMemberModel.create({
+      space_id: workSpace.space_id,
       user_id: req.session.passport?.user?.user_id,
     });
 
@@ -71,15 +78,6 @@ function createPasswordCode() {
   const randomBytes = crypto.randomBytes(3).toString("hex").toUpperCase(); 
   return `${timestamp}-${randomBytes}`;
 }
-
-
-
-
-
-
-
-
-
 
 // 특정 워크스페이스 조회
 exports.getSpace = async (req, res) => {

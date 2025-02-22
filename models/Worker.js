@@ -24,7 +24,7 @@ const Worker = sequelize.define(
       defaultValue: false,
     },
     deleted_at: {
-      type: DataTypes.DATEONLY,
+      type: DataTypes.DATE,
       allowNull: true,
     },
   },
