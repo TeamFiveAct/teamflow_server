@@ -348,7 +348,7 @@ exports.updateUserInfo = async (req, res) => {
 exports.getSession = (req, res) => {
   console.log(req.session);
   if (req.session.passport) {
-    return res.send(responseUtil('SUCCESS', '세션이 존재합니다.', null));
+    return res.send(responseUtil('SUCCESS', '세션이 존재합니다.', req.session.passport.user.auth_provider));
   }
   return res.send(responseUtil('ERROR', '세션이 없습니다.', null));
 };
