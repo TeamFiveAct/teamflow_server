@@ -1,4 +1,3 @@
-const Workspace = require('../models/Workspace');
 const workSpaceModel = require('../models/Workspace');
 const userModel = require('../models/User');
 const workSpaceMemberModel = require('../models/WorkspaceMember');
@@ -261,7 +260,8 @@ exports.postSpaceJoin = async (req, res) => {
 // 협업초대 메일발송
 exports.postSpaceInvite = async (req, res, next) => {
   try {
-    const { email, space_id } = req.body;
+    const { space_id } = req.params;
+    const { email } = req.body;
 
     if (!email || !space_id) {
       return res
@@ -270,13 +270,64 @@ exports.postSpaceInvite = async (req, res, next) => {
     }
 
     // 예제 초대 코드 (실제 서비스에서는 DB에서 가져오거나 생성해야 함)
-    const inviteCode = 'ABC123';
+    const workSpace = await workSpaceModel.findOne({
+      where:{
+        space_id: space_id
+      },
+      attributes: ['space_password','space_title']
+    })
+
+    const workSpaceTitle = workSpace.space_title;
+    const inviteCode = workSpace.space_password;
 
     // 이메일 발송 내용을 req.body에 추가하여 미들웨어에서 사용함!
     req.body.subject = 'TeamFlow - 워크스페이스에 초대되었습니다!';
     req.body.to = email;
     req.body.text = `워크스페이스에 초대되었습니다. 초대 코드: ${inviteCode}`;
-    req.body.html = `<p>워크스페이스에 초대되었습니다.</p><p>초대 코드: <b>${inviteCode}</b></p>`;
+    req.body.html = req.body.html = req.body.html = `
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+      <meta charset="UTF-8" />
+      <title>워크스페이스 초대</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; color: #333333; margin: 0; padding: 0; background-color: #f2f2f2;">
+      <!-- 이메일 전체 컨테이너 -->
+      <div style="width: 100%; padding: 30px 0; display: flex; justify-content: center;">
+        <!-- 실제 콘텐츠 박스 -->
+        <div style="width: 90%; max-width: 600px; background-color: #ffffff; border-radius: 6px; padding: 20px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+          <h1 style="text-align: center; color: #007bff; margin-bottom: 20px;">${workSpaceTitle} 워크스페이스 초대</h1>
+          
+          <p>📢새로운 워크스페이스에 초대되었습니다!</p>
+          <p>아래의 초대 코드를 복사하여 가입 과정에서 입력해주세요.</p>
+    
+          <!-- 초대코드 박스 -->
+          <div style="margin: 20px 0; padding: 15px; background-color: #007bff; color: #ffffff; font-weight: bold; text-align: center; border-radius: 4px; letter-spacing: 1px; font-size: 1.2em;">
+            ${inviteCode}
+          </div>
+    
+          <!-- 이동 버튼 -->
+          <p style="text-align: center;">
+            <!-- 워크스페이스로 이동할 URL을 href 속성에 넣어주세요 -->
+            <a href="https://your-workspace-url.com"
+               style="display: inline-block; padding: 12px 24px; background-color: #007bff; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; margin: 0 auto;">
+              워크스페이스로 이동
+            </a>
+          </p>
+    
+          <p>즐거운 협업 되세요!</p>
+    
+          <!-- 푸터 -->
+          <div style="margin-top: 30px; font-size: 14px; color: #888888; text-align: center;">
+            © 2025 TeamFlow Service
+          </div>
+        </div>
+      </div>
+    </body>
+    </html>
+    `;
+    
+    
 
     // 이메일 미들웨어 실행
     sendEmailMiddleware(req, res, () => {
