@@ -185,6 +185,7 @@ router.get("/:space_id", isAuthenticated, controller.getSpace);
  */
 router.get("/:space_id/member", isAuthenticated, controller.getSpaceMember);
 
+
 // // 워크스페이스 생성
 // router.post("/", isAuthenticated, controller.postSpaceCreate);
 // // 현재 사용자가 참여한 모든 워크스페이스 조회 (GET)
@@ -197,7 +198,6 @@ router.get("/:space_id/member", isAuthenticated, controller.getSpaceMember);
 // router.get("/:space_id/member", isAuthenticated, controller.getSpaceMember);
 // // 워크스페이스 초대 
 // router.post("/:space_id/invite", isAuthenticated, controller.postSpaceInvite);
-
 
 
 module.exports = router;
