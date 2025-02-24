@@ -409,12 +409,6 @@ router.get('/kakao-login', controller.getKakaoLogin);
 
 /**
  * @swagger
-<<<<<<< HEAD
- * tags:
- *   name: User
- *   description: 사용자 관련 API
- */
-=======
  * /v1/user/kakao/callback:
  *   get:
  *     summary: 카카오 로그인 콜백 (자동 호출)
@@ -439,27 +433,11 @@ router.get('/kakao-login', controller.getKakaoLogin);
  */
 // 카카오 로그인 콜백 함수 (카카오 로그인 성공/실패시) - 클라이언트에서 호출해줄필요없이 리다이렉트 됨
 router.get('/kakao/callback', controller.getKakaoCallback);
->>>>>>> 9c9c8712a20c575adcec6462050c028f5fff2e46
 
 /**
  * @swagger
  * /v1/user/logout:
  *   post:
-<<<<<<< HEAD
- *     summary: 이메일 기반 로그아웃
- *     description: 로그인한 사용자의 세션을 종료하고 쿠키를 제거하여 로그아웃 처리합니다.
- *     tags: [User]
- *     parameters:
- *       - in: cookie
- *         name: connect.sid
- *         required: true
- *         description: 사용자 세션 쿠키
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: 로그아웃 성공
-=======
  *     summary: 사용자 로그아웃 (이메일 기반)
  *     description: 현재 로그인된 사용자의 세션을 삭제하고 로그아웃합니다.
  *     tags: [User]
@@ -472,7 +450,6 @@ router.get('/kakao/callback', controller.getKakaoCallback);
  *             schema:
  *               type: string
  *               example: "connect.sid=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT"
->>>>>>> 9c9c8712a20c575adcec6462050c028f5fff2e46
  *         content:
  *           application/json:
  *             schema:
@@ -483,9 +460,6 @@ router.get('/kakao/callback', controller.getKakaoCallback);
  *                   example: "SUCCESS"
  *                 message:
  *                   type: string
-<<<<<<< HEAD
- *                   example: "로그아웃 성공했습니다."
-=======
  *                   example: "로그아웃이 처리되었습니다."
  *                 data:
  *                   type: object
@@ -503,16 +477,11 @@ router.get('/kakao/callback', controller.getKakaoCallback);
  *                 message:
  *                   type: string
  *                   example: "로그인된 사용자가 아닙니다."
->>>>>>> 9c9c8712a20c575adcec6462050c028f5fff2e46
  *                 data:
  *                   type: object
  *                   nullable: true
  *       500:
-<<<<<<< HEAD
- *         description: 로그아웃 처리 중 서버 오류 발생
-=======
  *         description: 서버 오류 발생
->>>>>>> 9c9c8712a20c575adcec6462050c028f5fff2e46
  *         content:
  *           application/json:
  *             schema:
@@ -528,11 +497,8 @@ router.get('/kakao/callback', controller.getKakaoCallback);
  *                   type: object
  *                   nullable: true
  */
-<<<<<<< HEAD
-=======
 
 // 이메일 기반 로그아웃
->>>>>>> 9c9c8712a20c575adcec6462050c028f5fff2e46
 router.post('/logout', controller.postLogout);
 
 /**
@@ -540,20 +506,6 @@ router.post('/logout', controller.postLogout);
  * /v1/user/kakao-logout:
  *   post:
  *     summary: 카카오 로그아웃
-<<<<<<< HEAD
- *     description: 카카오 액세스 토큰을 사용하여 카카오 로그아웃 API를 호출한 후, 세션과 쿠키를 제거합니다.
- *     tags: [User]
- *     parameters:
- *       - in: cookie
- *         name: connect.sid
- *         required: true
- *         description: 사용자 세션 쿠키
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: 카카오 로그아웃 성공
-=======
  *     description: 현재 로그인된 사용자의 카카오 계정에서 로그아웃합니다. 세션과 쿠키도 삭제됩니다.
  *     tags: [User]
  *     responses:
@@ -565,7 +517,6 @@ router.post('/logout', controller.postLogout);
  *             schema:
  *               type: string
  *               example: "connect.sid=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT"
->>>>>>> 9c9c8712a20c575adcec6462050c028f5fff2e46
  *         content:
  *           application/json:
  *             schema:
@@ -580,13 +531,8 @@ router.post('/logout', controller.postLogout);
  *                 data:
  *                   type: object
  *                   nullable: true
-<<<<<<< HEAD
- *       500:
- *         description: 로그아웃 처리 중 서버 오류 발생 또는 카카오 로그아웃 실패
-=======
  *       401:
  *         description: 로그인되지 않은 사용자 (세션이 없음)
->>>>>>> 9c9c8712a20c575adcec6462050c028f5fff2e46
  *         content:
  *           application/json:
  *             schema:
@@ -597,9 +543,6 @@ router.post('/logout', controller.postLogout);
  *                   example: "ERROR"
  *                 message:
  *                   type: string
-<<<<<<< HEAD
- *                   example: "서버 오류가 발생했습니다."
-=======
  *                   example: "로그인 상태가 아닙니다."
  *                 data:
  *                   type: object
@@ -633,44 +576,24 @@ router.post('/logout', controller.postLogout);
  *                 message:
  *                   type: string
  *                   example: "카카오 로그아웃 실패했습니다."
->>>>>>> 9c9c8712a20c575adcec6462050c028f5fff2e46
  *                 data:
  *                   type: object
  *                   nullable: true
  */
-<<<<<<< HEAD
-=======
 
 // 카카오 로그아웃
->>>>>>> 9c9c8712a20c575adcec6462050c028f5fff2e46
 router.post('/kakao-logout', controller.postKakaoLogout);
 
 /**
  * @swagger
  * /v1/user/session:
  *   get:
-<<<<<<< HEAD
- *     summary: 세션 여부 확인
- *     description: 현재 로그인한 사용자의 세션 존재 여부를 확인합니다. 세션이 존재하면 인증 제공자(auth_provider) 정보를 반환합니다.
- *     tags: [User]
- *     parameters:
- *       - in: cookie
- *         name: connect.sid
- *         required: true
- *         description: 사용자 세션 쿠키
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: 세션 존재 여부에 따라 응답 (세션이 존재하면 SUCCESS, 없으면 ERROR)
-=======
  *     summary: 현재 로그인한 사용자 세션 확인
  *     description: 현재 로그인된 사용자의 세션 정보를 확인합니다.
  *     tags: [User]
  *     responses:
  *       200:
  *         description: 세션이 존재하는 경우 (로그인된 사용자)
->>>>>>> 9c9c8712a20c575adcec6462050c028f5fff2e46
  *         content:
  *           application/json:
  *             schema:
@@ -678,16 +601,6 @@ router.post('/kakao-logout', controller.postKakaoLogout);
  *               properties:
  *                 status:
  *                   type: string
-<<<<<<< HEAD
- *                   example: "SUCCESS"  # 세션이 있을 경우, "ERROR"일 경우도 있음
- *                 message:
- *                   type: string
- *                   example: "세션이 존재합니다."  # 또는 "세션이 없습니다."
- *                 data:
- *                   type: string
- *                   nullable: true
- */
-=======
  *                   example: "SUCCESS"
  *                 message:
  *                   type: string
@@ -729,28 +642,12 @@ router.post('/kakao-logout', controller.postKakaoLogout);
  *                   nullable: true
  */
 // 세션 여부 확인
->>>>>>> 9c9c8712a20c575adcec6462050c028f5fff2e46
 router.get('/session', controller.getSession);
 
 /**
  * @swagger
  * /v1/user:
  *   delete:
-<<<<<<< HEAD
- *     summary: 회원탈퇴
- *     description: 로그인한 사용자의 회원탈퇴를 진행합니다. 이메일 사용자는 soft delete 처리하고, 카카오 사용자는 카카오 탈퇴 API 호출 후 탈퇴 처리합니다.
- *     tags: [User]
- *     parameters:
- *       - in: cookie
- *         name: connect.sid
- *         required: true
- *         description: 사용자 인증 쿠키
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: 회원탈퇴 성공
-=======
  *     summary: 회원 탈퇴 (이메일 & 카카오)
  *     description: 로그인된 사용자의 계정을 소프트 삭제(soft delete)하고 세션을 삭제합니다. 카카오 로그인 사용자의 경우 카카오 서비스 연결 해제 후 탈퇴합니다.
  *     tags: [User]
@@ -763,7 +660,6 @@ router.get('/session', controller.getSession);
  *             schema:
  *               type: string
  *               example: "connect.sid=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT"
->>>>>>> 9c9c8712a20c575adcec6462050c028f5fff2e46
  *         content:
  *           application/json:
  *             schema:
@@ -774,9 +670,6 @@ router.get('/session', controller.getSession);
  *                   example: "SUCCESS"
  *                 message:
  *                   type: string
-<<<<<<< HEAD
- *                   example: "이메일 회원 탈퇴가 완료되었습니다."  # 또는 "카카오 회원 탈퇴가 완료되었습니다."
-=======
  *                   example: "이메일 or 카카오 회원 탈퇴가 완료되었습니다."
  *                 data:
  *                   type: object
@@ -826,16 +719,11 @@ router.get('/session', controller.getSession);
  *                 message:
  *                   type: string
  *                   example: "카카오 액세스 토큰을 찾을 수 없습니다."
->>>>>>> 9c9c8712a20c575adcec6462050c028f5fff2e46
  *                 data:
  *                   type: object
  *                   nullable: true
  *       500:
-<<<<<<< HEAD
- *         description: 회원탈퇴 처리 중 서버 오류 발생
-=======
  *         description: 서버 오류 발생
->>>>>>> 9c9c8712a20c575adcec6462050c028f5fff2e46
  *         content:
  *           application/json:
  *             schema:
@@ -851,11 +739,8 @@ router.get('/session', controller.getSession);
  *                   type: object
  *                   nullable: true
  */
-<<<<<<< HEAD
-=======
 
 // 회원탈퇴
->>>>>>> 9c9c8712a20c575adcec6462050c028f5fff2e46
 router.delete('/', controller.deleteMyInfo);
 
 /**

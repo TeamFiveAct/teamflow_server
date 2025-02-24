@@ -199,10 +199,6 @@ router.post('/invite', isAuthenticated, controller.postSpaceInvite);
  *                   type: object
  *                   nullable: true
  */
-<<<<<<< HEAD
-=======
-
->>>>>>> 9c9c8712a20c575adcec6462050c028f5fff2e46
 router.post('/join', isAuthenticated, controller.postSpaceJoin);
 
 /**
