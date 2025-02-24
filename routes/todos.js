@@ -41,6 +41,11 @@ const isAuthenticated = require('../middlewares/isAuthenticated'); // 로그인 
  */
 router.post("/",isAuthenticated, controller.postTodoList);
 
+
+
+router.post("/statelodeed",isAuthenticated, controller.postTodoStateList);
+
+
 /**
  * @swagger
  * /todos/add:
