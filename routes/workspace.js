@@ -96,12 +96,13 @@ router.post('/invite', isAuthenticated, controller.postSpaceInvite);
 
 /**
  * @swagger
- * /workspaces/join:
+ * /v1/workspace/join:
  *   post:
- *     summary: 워크스페이스 참여 신청 (초대 코드 입력 후 참여)
- *     tags: [Workspaces]
+ *     summary: 워크스페이스 참여 신청
+ *     description: 사용자가 비밀번호를 입력하여 워크스페이스에 참여합니다. 세션이 필요합니다.
+ *     tags: [Workspace]
  *     security:
- *       - BearerAuth: []
+ *       - CookieAuth: []  # 세션이 필요하므로 인증 추가
  *     requestBody:
  *       required: true
  *       content:
@@ -109,13 +110,99 @@ router.post('/invite', isAuthenticated, controller.postSpaceInvite);
  *           schema:
  *             type: object
  *             properties:
- *               invite_code:
+ *               space_password:
  *                 type: string
- *                 example: "ABC123"
+ *                 description: 워크스페이스 입장 비밀번호
+ *                 example: "mypassword123"
  *     responses:
  *       200:
- *         description: 워크스페이스에 성공적으로 참여됨
+ *         description: 워크스페이스 참여 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "SUCCESS"
+ *                 message:
+ *                   type: string
+ *                   example: "워크스페이스에 성공적으로 참여하였습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       401:
+ *         description: 로그인되지 않은 사용자 (세션 없음)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "로그인이 필요합니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       400:
+ *         description: 잘못된 요청 (비밀번호 없음 또는 불일치)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   oneOf:
+ *                     - type: string
+ *                       example: "비밀번호를 입력해주세요."
+ *                     - type: string
+ *                       example: "워크스페이스 비밀번호가 일치하지 않습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       409:
+ *         description: 이미 해당 워크스페이스의 멤버인 경우
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "이미 이 워크스페이스의 멤버입니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       500:
+ *         description: 서버 오류 발생
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류가 발생했습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
  */
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9c9c8712a20c575adcec6462050c028f5fff2e46
 router.post('/join', isAuthenticated, controller.postSpaceJoin);
 
 /**
