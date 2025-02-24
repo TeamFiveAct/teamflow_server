@@ -1,0 +1,107 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat Application</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- Header / Navigation Bar -->
+    <header>
+      <div class="logo">ChatApp</div>
+      <div class="header-icons">
+        <div class="token-widget">
+          <span class="token-balance"
+            >Tokens: <span id="token-balance">100</span></span
+          >
+          <button id="recharge-button">Recharge</button>
+        </div>
+        <svg
+          class="icon notifications-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+        >
+          <!-- SVG content for notifications icon -->
+          <path
+            d="M12 24c1.104 0 2-.896 2-2h-4c0 1.104.896 2 2 2zm6.764-6.901c-.62-.479-1.464-.935-2.764-.935s-2.144.456-2.764.935c-1.906-1.425-3.236-3.632-3.236-6.099 0-4.136 3.41-7.5 7.5-7.5s7.5 3.364 7.5 7.5c0 2.467-1.33 4.674-3.236 6.099z"
+          />
+        </svg>
+        <svg
+          class="icon settings-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+        >
+          <!-- SVG content for settings icon -->
+          <path
+            d="M19.14 12.936l1.259-1.472-1.506-2.613-1.624.909a7.895 7.895 0 0 0-1.822-1.054l-.249-1.785h-3l-.249 1.785a7.89 7.89 0 0 0-1.822 1.054l-1.624-.909-1.506 2.613 1.259 1.472c-.025.304-.038.611-.038.923s.013.619.038.923l-1.259 1.472 1.506 2.613 1.624-.909c.547.433 1.16.794 1.822 1.054l.249 1.785h3l.249-1.785a7.89 7.89 0 0 0 1.822-1.054l1.624.909 1.506-2.613-1.259-1.472c.025-.304.038-.611.038-.923s-.013-.619-.038-.923zm-7.14 2.064c-1.654 0-3-1.346-3-3s1.346-3 3-3 3 1.346 3 3-1.346 3-3 3z"
+          />
+        </svg>
+        <button id="logout-button">Logout</button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+      <!-- Friends List Sidebar -->
+      <aside class="sidebar">
+        <div class="search-add-friends">
+          <input
+            type="text"
+            id="friend-search-input"
+            placeholder="Search friends"
+          />
+          <div id="friend-suggestions" class="suggestions">
+            <!-- Friend suggestions will be populated here -->
+          </div>
+        </div>
+        <ul class="friends-list" id="friends-list">
+          <!-- Friends will be listed here -->
+        </ul>
+        <button id="start-new-chat-button">Start New Chat</button>
+      </aside>
+
+      <!-- Chat Section -->
+      <main class="chat-area">
+        <div class="chat-header">
+          <div class="chat-header-info">
+            <img
+              id="chat-friend-avatar"
+              src=""
+              alt="Friend Avatar"
+              class="avatar"
+            />
+            <span id="chat-friend-name">Select a chat to start messaging</span>
+            <span id="vip-tier" class="vip-tier"></span>
+          </div>
+          <div class="chat-header-buttons">
+            <button id="media-only-button">Media Only</button>
+            <button id="support-status-button">Support Status</button>
+          </div>
+        </div>
+        <div class="chat-list" id="chat-list">
+          <!-- List of chats -->
+        </div>
+        <div class="chat-messages" id="chat-messages">
+          <!-- Chat messages will be displayed here -->
+        </div>
+        <div class="chat-input">
+          <input
+            type="text"
+            id="chat-input-field"
+            placeholder="Type a message"
+          />
+          <button id="send-message-button">Send</button>
+        </div>
+      </main>
+    </div>
+
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav">
+      <button id="nav-friends">Friends</button>
+      <button id="nav-chats">Chats</button>
+      <button id="nav-settings">Settings</button>
+    </nav>
+
+    <script src="script.js"></script>
+  </body>
+</html>
