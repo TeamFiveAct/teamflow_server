@@ -6,7 +6,6 @@ const isAuthenticated = require('../middlewares/isAuthenticated'); // 로그인 
 // workspace 라우터의 기본 URL은 workspace/ 입니다!!!
 /* 컨트롤러의 이름은 임의로 설정하였으니 각각 용도에 맞춰 작성해주세요~ 😀 */
 
-
 /**
  * @swagger
  * tags:
@@ -39,7 +38,7 @@ const isAuthenticated = require('../middlewares/isAuthenticated'); // 로그인 
  *       201:
  *         description: 워크스페이스가 성공적으로 생성됨
  */
-router.post("/", isAuthenticated, controller.postSpaceCreate);
+router.post('/', isAuthenticated, controller.postSpaceCreate);
 
 /**
  * @swagger
@@ -66,7 +65,7 @@ router.post("/", isAuthenticated, controller.postSpaceCreate);
  *                     type: string
  *                     example: "내 워크스페이스"
  */
-router.get("/user", isAuthenticated, controller.getMySpace);
+router.get('/user', isAuthenticated, controller.getMySpace);
 
 /**
  * @swagger
@@ -93,7 +92,7 @@ router.get("/user", isAuthenticated, controller.getMySpace);
  *       200:
  *         description: 초대가 성공적으로 전송됨
  */
-router.post("/invite", isAuthenticated, controller.postSpaceInvite);
+router.post('/invite', isAuthenticated, controller.postSpaceInvite);
 
 /**
  * @swagger
@@ -117,7 +116,7 @@ router.post("/invite", isAuthenticated, controller.postSpaceInvite);
  *       200:
  *         description: 워크스페이스에 성공적으로 참여됨
  */
-router.post("/join", isAuthenticated, controller.postSpaceJoin);
+router.post('/join', isAuthenticated, controller.postSpaceJoin);
 
 /**
  * @swagger
@@ -149,7 +148,7 @@ router.post("/join", isAuthenticated, controller.postSpaceJoin);
  *                   type: string
  *                   example: "내 워크스페이스"
  */
-router.get("/:space_id", isAuthenticated, controller.getSpace);
+router.get('/:space_id', isAuthenticated, controller.getSpace);
 
 /**
  * @swagger
@@ -183,8 +182,7 @@ router.get("/:space_id", isAuthenticated, controller.getSpace);
  *                     type: string
  *                     example: "홍길동"
  */
-router.get("/:space_id/member", isAuthenticated, controller.getSpaceMember);
-
+router.get('/:space_id/member', isAuthenticated, controller.getSpaceMember);
 
 // // 워크스페이스 생성
 // router.post("/", isAuthenticated, controller.postSpaceCreate);
@@ -196,9 +194,7 @@ router.get("/:space_id/member", isAuthenticated, controller.getSpaceMember);
 // router.get('/:space_id', isAuthenticated, controller.getSpace);
 // // 특정 워크스페이스 멤버 조회 (GET이 더 적절)
 // router.get("/:space_id/member", isAuthenticated, controller.getSpaceMember);
-// // 워크스페이스 초대 
+// // 워크스페이스 초대
 // router.post("/:space_id/invite", isAuthenticated, controller.postSpaceInvite);
 
-
 module.exports = router;
-

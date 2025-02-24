@@ -1,6 +1,6 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router({ mergeParams: true }); // app.js의 라우터 경로의 params 값을 받아올 수 있도록
-const controller = require("../controllers/Ctodos");
+const controller = require('../controllers/Ctodos');
 const isAuthenticated = require('../middlewares/isAuthenticated'); // 로그인 여부 체크 미들웨어
 
 // todos 라우터의 기본 URL은 todos/ 입니다!!!
@@ -39,7 +39,7 @@ const isAuthenticated = require('../middlewares/isAuthenticated'); // 로그인 
  *                     type: string
  *                     example: "업무 설명"
  */
-router.post("/",isAuthenticated, controller.postTodoList);
+router.post('/', isAuthenticated, controller.postTodoList);
 
 /**
  * @swagger
@@ -64,7 +64,7 @@ router.post("/",isAuthenticated, controller.postTodoList);
  *       201:
  *         description: 업무가 성공적으로 생성됨
  */
-router.post("/add",isAuthenticated, controller.postTodoCreate);
+router.post('/add', isAuthenticated, controller.postTodoCreate);
 
 /**
  * @swagger
@@ -97,7 +97,7 @@ router.post("/add",isAuthenticated, controller.postTodoCreate);
  *                   type: string
  *                   example: "업무 설명"
  */
-router.post("/view/:todo_id",isAuthenticated, controller.postTodo);
+router.post('/view/:todo_id', isAuthenticated, controller.postTodo);
 
 /**
  * @swagger
@@ -129,7 +129,7 @@ router.post("/view/:todo_id",isAuthenticated, controller.postTodo);
  *       200:
  *         description: 업무가 성공적으로 수정됨
  */
-router.patch("/:todo_id",isAuthenticated, controller.patchTodo);
+router.patch('/:todo_id', isAuthenticated, controller.patchTodo);
 
 /**
  * @swagger
@@ -148,7 +148,7 @@ router.patch("/:todo_id",isAuthenticated, controller.patchTodo);
  *       200:
  *         description: 업무가 성공적으로 소프트 삭제됨
  */
-router.delete("/:todo_id",isAuthenticated, controller.deleteTodo);
+router.delete('/:todo_id', isAuthenticated, controller.deleteTodo);
 
 /**
  * @swagger
@@ -167,7 +167,11 @@ router.delete("/:todo_id",isAuthenticated, controller.deleteTodo);
  *       200:
  *         description: 업무가 성공적으로 영구 삭제됨
  */
-router.delete("/permanent/:todo_id",isAuthenticated, controller.deleteHardDeleteTodo);
+router.delete(
+  '/permanent/:todo_id',
+  isAuthenticated,
+  controller.deleteHardDeleteTodo
+);
 
 /**
  * @swagger
@@ -186,7 +190,7 @@ router.delete("/permanent/:todo_id",isAuthenticated, controller.deleteHardDelete
  *       200:
  *         description: 업무가 성공적으로 복구됨
  */
-router.patch("/restore/:todo_id",isAuthenticated, controller.restoreTodo);
+router.patch('/restore/:todo_id', isAuthenticated, controller.restoreTodo);
 
 /**
  * @swagger
@@ -215,10 +219,7 @@ router.patch("/restore/:todo_id",isAuthenticated, controller.restoreTodo);
  *       200:
  *         description: 업무 상태가 성공적으로 변경됨
  */
-router.patch("/state/:todo_id",isAuthenticated, controller.patchTodoState);
-
-
-
+router.patch('/state/:todo_id', isAuthenticated, controller.patchTodoState);
 
 // // 전체 업무 리스트 조회
 // router.post("/", isAuthenticated, controller.postTodoList);
@@ -240,4 +241,3 @@ router.patch("/state/:todo_id",isAuthenticated, controller.patchTodoState);
 // router.patch("/restore/:todo_id",isAuthenticated, controller.restoreTodo);
 
 module.exports = router;
-
