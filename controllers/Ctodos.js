@@ -165,24 +165,24 @@ exports.deleteTodo = async (req, res) => {
       });
     }
 
-    // 삭제할 업무 작성자 조회
-    const todo_writer = await workerModel.findOne({
-      where:{todo_id: todo_id}
-    });
+    // // 삭제할 업무 작성자 조회
+    // const todo_writer = await workerModel.findOne({
+    //   where:{todo_id: todo_id}
+    // });
 
-    // 해당 협업 참여자 조회
-    const spaceMember = await workSpaceMemberModel.findOne({
-      where:{
-        space_id: space_id,
-        user_id: user_id
-      }
-    })
+    // // 해당 협업 참여자 조회
+    // const spaceMember = await workSpaceMemberModel.findOne({
+    //   where:{
+    //     space_id: space_id,
+    //     user_id: user_id
+    //   }
+    // })
 
-    // 업무 참여자도 소프트 삭제 (휴지통)
-    const softDelWork = await workerModel.update(
-      { is_deleted: true, deleted_at: new Date().toISOString().slice(0, 19).replace("T", " ") },
-      { where: { todo_id: todo_id, mem_id: todo_writer.mem_id } }
-    );
+    // // 업무 참여자도 소프트 삭제 (휴지통)
+    // const softDelWork = await workerModel.update(
+    //   { is_deleted: true, deleted_at: new Date().toISOString().slice(0, 19).replace("T", " ") },
+    //   { where: { todo_id: todo_id, mem_id: todo_writer.mem_id } }
+    // );
 
     // 업무 소프트 삭제
     const softDelTodo = await todo.update(
@@ -220,25 +220,25 @@ exports.deleteHardDeleteTodo = async (req, res) => {
       });
     }
 
-   // 해당 협업 참여자 조회
-   const spaceMember = await workSpaceMemberModel.findOne({
-    where:{
-      space_id: space_id,
-      user_id: user_id
-    }
-  });
+  //  // 해당 협업 참여자 조회
+  //  const spaceMember = await workSpaceMemberModel.findOne({
+  //   where:{
+  //     space_id: space_id,
+  //     user_id: user_id
+  //   }
+  // });
 
-    // 삭제할 업무 작성자 조회
-    const todo_writer = await workerModel.findOne({
-      where:{todo_id: todo_id, mem_id:spaceMember.mem_id}
-    });
+  //   // 삭제할 업무 작성자 조회
+  //   const todo_writer = await workerModel.findOne({
+  //     where:{todo_id: todo_id, mem_id:spaceMember.mem_id}
+  //   });
 
-    // 먼저 연관된 데이터(예: workerModel) 삭제
-    await workerModel.destroy({
-      where: {
-       todo_id: todo_id, mem_id: todo_writer.mem_id 
-      } 
-    });
+  //   // 먼저 연관된 데이터(예: workerModel) 삭제
+  //   await workerModel.destroy({
+  //     where: {
+  //      todo_id: todo_id, mem_id: todo_writer.mem_id 
+  //     } 
+  //   });
 
     // 실제 업무 데이터 삭제
     await todo.destroy();
@@ -265,16 +265,16 @@ exports.restoreTodo = async (req, res) => {
       return res.send(responseUtil('ERROR', '삭제된 업무를 찾을 수 없습니다.', null))
     }
 
-    // 소프트 삭제된 업무 작성자 조회
-    const todo_writer = await workerModel.findOne({
-      where:{todo_id: todo_id}
-    });
+    // // 소프트 삭제된 업무 작성자 조회
+    // const todo_writer = await workerModel.findOne({
+    //   where:{todo_id: todo_id}
+    // });
     
-    // 삭제된 Worker들도 복구
-    await workerModel.update(
-      { is_deleted: false, deleted_at: null },
-      { where: { todo_id: todo_id, mem_id:todo_writer.mem_id } }
-    );
+    // // 삭제된 Worker들도 복구
+    // await workerModel.update(
+    //   { is_deleted: false, deleted_at: null },
+    //   { where: { todo_id: todo_id, mem_id:todo_writer.mem_id } }
+    // );
 
     // 업무 복구
     await todo.update({ is_deleted: false, deleted_at: null });
