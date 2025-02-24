@@ -1,3 +1,4 @@
+//teamflow_server\routes\upload.js
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
@@ -17,7 +18,35 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// 파일 업로드 엔드포인트 (POST /upload)
+/**
+ * @swagger
+ * /upload:
+ *   post:
+ *     summary: 파일 업로드
+ *     tags: [fileupload]
+ *     description: 클라이언트에서 업로드한 파일을 서버의 uploads 폴더에 저장하고, 접근 가능한 URL을 반환합니다.
+ *     consumes:
+ *       - multipart/form-data
+ *     parameters:
+ *       - in: formData
+ *         name: file
+ *         type: file
+ *         description: 업로드할 파일
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: 파일 업로드 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 url:
+ *                   type: string
+ *                   description: 업로드된 파일의 URL
+ *       400:
+ *         description: 파일이 업로드되지 않은 경우
+ */
 router.post('/', upload.single('file'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded' });

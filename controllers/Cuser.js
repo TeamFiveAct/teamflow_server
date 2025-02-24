@@ -170,6 +170,9 @@ exports.getKakaoCallback = (req, res, next) => {
 
 // 이메일 기반 로그아웃 POST /v1/user/logout
 exports.postLogout = (req, res) => {
+  if (!req.isAuthenticated() || !req.session) {
+    return res.send(responseUtil('ERROR', '로그인된 사용자가 아닙니다.', null));
+  }
   console.log('로그아웃 전 세션 확인', req.session);
   req.logout((err) => {
     req.session.destroy((sessionErr) => {
