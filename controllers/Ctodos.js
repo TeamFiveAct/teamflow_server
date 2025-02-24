@@ -1,34 +1,72 @@
-const { where } = require("sequelize");
 const todoModel = require("../models/Todo");
 const workerModel = require("../models/Worker");
 const workSpaceMemberModel = require("../models/WorkspaceMember");
 const responseUtil = require('../utils/ResponseUtil');
 
-
 // 전체 업무 리스트
 exports.postTodoList = async (req, res) => {
   try {
-    const todos = await todoModel.findAll({
-      where: {
-        space_id: req.params.space_id,
-        is_deleted: false
-      },
-    });
+    const spaceId = req.params.space_id;
+    const limit = 5;// 기본값 지정
+    const statuses = ["plan", "progress", "done"];// 가져올 칸반보드 상태 목록
 
-    // 업무가 없을때
-    if (todos.length == 0) {
-      return res.send(responseUtil('SUCCESS', '업무가 존재하지 않습니다'));
+    // 각 상태별로 5개씩 가져오기
+    const todoPromises = await Promise.all(
+      statuses.map((status) =>
+        todoModel.findAll({
+          where: {
+            space_id: spaceId,
+            status: status, // 상태별 필터링
+            is_deleted: false,
+          },
+          order: [["created_at", "ASC"]], // 생성일 기준 정렬
+          limit: limit,
+        })
+      )
+    );
+    
+    // 업무가 존재하지 않을경우
+    if (!todoPromises || todoPromises.length === 0 || todoPromises.every(todos => todos.length === 0)) {
+      return res.send(responseUtil('SUCCESS', '조회할 업무가 없습니다.', null));
     }
+    
+    // 병렬로 모든 상태 데이터 가져오기
+    const results = await Promise.all(todoPromises);
 
-    // 업무가 존재할때
-    const allTodo = todos.map((todo) => todo.dataValues);
+    console.log(results);
 
-    res.send(responseUtil('SUCCESS', '전체 업무 조회성공했습니다.', allTodo));
+    // 업무 데이터 3단계 가공
+    const todoList = {};
+    statuses.forEach((status, index) => {
+      todoList[status] = results[index].map((todo) => todo.dataValues);
+    });
+    res.send(responseUtil('SUCCESS', '전체업무 목록을 가져왔습니다.', todoList));
   } catch (error) {
-    console.log('getTodoItem Controller Err:', error);
+    console.log('postTodoList Controller Err:', error);
     res.send(responseUtil('ERROR', '전체 업무조회에 실패하였습니다.', null));
   }
 };
+
+// 특정 상태의 업무 리스트 조회
+exports.postTodoStateList = async (req,res)=>{
+  try{
+      const { state, limit, offset } = req.body;
+      
+      // 조회 기본값 설정
+      const taskLimit = parseInt(limit) || 5;
+      const taskOffset = parseInt(offset) || 0;
+      const tasks = await todoModel.findAll({
+        where: { status:state }, // 상태 필터링
+        order: [["created_at", "ASC"]], // 생성일 기준 정렬
+        limit: taskLimit, // 개수 제한
+        offset: taskOffset // 시작 위치 설정
+      });
+    res.send(responseUtil('SUCCESS', '전체업무 목록을 가져왔습니다.', tasks));
+  }catch(error){
+    console.log('postTodoStateList Controller Err:', error);
+    res.send(responseUtil('ERROR', '전체 업무조회에 실패하였습니다.', null));
+  }
+}
 
 // 특정 업무 조회
 exports.postTodo = async (req, res) => {
@@ -46,7 +84,7 @@ exports.postTodo = async (req, res) => {
       })
     );
   } catch (error) {
-    console.log('getTodoItem Controller Err:', error);
+    console.log('postTodo Controller Err:', error);
     res.send(responseUtil('ERROR', '업무 조회에 실패하였습니다.', null));
   }
 };
@@ -81,8 +119,8 @@ exports.postTodoCreate = async (req, res) => {
 
 
     res.send(responseUtil('SUCCESS', '업무생성 성공했습니다.', null));
-  } catch (err) {
-    console.log(err);
+  } catch (error) {
+    console.log('postTodoCreate Controller Err:', error);
     res.send(responseUtil('ERROR', '업무 생성에 실패하였습니다.', null));
   }
 };
@@ -105,8 +143,8 @@ exports.patchTodo = async (req, res) => {
     // body 로 들어온 값만 update 됨 (기존 조회했던 데이터 기준으로 수정)
     await todo.update(updateData);
     res.send(responseUtil('SUCCESS', '업무 수정 성공했습니다.', todo));
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.log('patchTodo Controller Err:', error);
     res.send(responseUtil('ERROR', '업무 수정에 실패하였습니다.', null));
   }
 };
@@ -127,24 +165,24 @@ exports.deleteTodo = async (req, res) => {
       });
     }
 
-    // 삭제할 업무 작성자 조회
-    const todo_writer = await workerModel.findOne({
-      where:{todo_id: todo_id}
-    });
+    // // 삭제할 업무 작성자 조회
+    // const todo_writer = await workerModel.findOne({
+    //   where:{todo_id: todo_id}
+    // });
 
-    // 해당 협업 참여자 조회
-    const spaceMember = await workSpaceMemberModel.findOne({
-      where:{
-        space_id: space_id,
-        user_id: user_id
-      }
-    })
+    // // 해당 협업 참여자 조회
+    // const spaceMember = await workSpaceMemberModel.findOne({
+    //   where:{
+    //     space_id: space_id,
+    //     user_id: user_id
+    //   }
+    // })
 
-    // 업무 참여자도 소프트 삭제 (휴지통)
-    const softDelWork = await workerModel.update(
-      { is_deleted: true, deleted_at: new Date().toISOString().slice(0, 19).replace("T", " ") },
-      { where: { todo_id: todo_id, mem_id: todo_writer.mem_id } }
-    );
+    // // 업무 참여자도 소프트 삭제 (휴지통)
+    // const softDelWork = await workerModel.update(
+    //   { is_deleted: true, deleted_at: new Date().toISOString().slice(0, 19).replace("T", " ") },
+    //   { where: { todo_id: todo_id, mem_id: todo_writer.mem_id } }
+    // );
 
     // 업무 소프트 삭제
     const softDelTodo = await todo.update(
@@ -152,18 +190,10 @@ exports.deleteTodo = async (req, res) => {
       { where: { space_id: space_id, todo_id: todo_id  } }
     );
 
-    res.send({
-      status: "SUCCESS",
-      message: "업무가 소프트 삭제되었습니다.",
-      data: null,
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send({
-      status: "ERROR",
-      message: "업무 삭제에 실패하였습니다.",
-      data: null,
-    });
+    res.send(responseUtil('SUCCESS', '업무가 소프트 삭제되었습니다.', null));
+  } catch (error) {
+    console.log('patchTodo Controller Err:', error);
+    res.send(responseUtil('ERROR', '업무 삭제에 실패하였습니다.', null));
   }
 };
 
@@ -190,41 +220,33 @@ exports.deleteHardDeleteTodo = async (req, res) => {
       });
     }
 
-   // 해당 협업 참여자 조회
-   const spaceMember = await workSpaceMemberModel.findOne({
-    where:{
-      space_id: space_id,
-      user_id: user_id
-    }
-  });
+  //  // 해당 협업 참여자 조회
+  //  const spaceMember = await workSpaceMemberModel.findOne({
+  //   where:{
+  //     space_id: space_id,
+  //     user_id: user_id
+  //   }
+  // });
 
-    // 삭제할 업무 작성자 조회
-    const todo_writer = await workerModel.findOne({
-      where:{todo_id: todo_id, mem_id:spaceMember.mem_id}
-    });
+  //   // 삭제할 업무 작성자 조회
+  //   const todo_writer = await workerModel.findOne({
+  //     where:{todo_id: todo_id, mem_id:spaceMember.mem_id}
+  //   });
 
-    // 먼저 연관된 데이터(예: workerModel) 삭제
-    await workerModel.destroy({
-      where: {
-       todo_id: todo_id, mem_id: todo_writer.mem_id 
-      } 
-    });
+  //   // 먼저 연관된 데이터(예: workerModel) 삭제
+  //   await workerModel.destroy({
+  //     where: {
+  //      todo_id: todo_id, mem_id: todo_writer.mem_id 
+  //     } 
+  //   });
 
-    // // 실제 업무 데이터 삭제
+    // 실제 업무 데이터 삭제
     await todo.destroy();
 
-    res.send({
-      status: "SUCCESS",
-      message: "업무가 하드 삭제되었습니다.",
-      data: null,
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send({
-      status: "ERROR",
-      message: "업무 하드 삭제에 실패하였습니다.",
-      data: null,
-    });
+    res.send(responseUtil('SUCCESS', '업무가 삭제되었습니다.', null));
+  } catch (error) {
+    console.log('deleteHardDeleteTodo Controller Err:', error);
+    res.send(responseUtil('ERROR', '업무 삭제에 실패하였습니다.', null));
   }
 };
 
@@ -233,45 +255,34 @@ exports.restoreTodo = async (req, res) => {
   try {
     const { todo_id, space_id } = req.params;
 
-    // 삭제된 todo 찾기
+    // 소프트 삭제된 todo 찾기
     const todo = await todoModel.findOne({
       where: { space_id:space_id, todo_id: todo_id, is_deleted: true },
     });
 
+    // 복구할 todo가 존재하지 않을경우
     if (!todo) {
-      return res.status(404).send({
-        status: "ERROR",
-        message: "삭제된 업무를 찾을 수 없습니다.",
-        data: null,
-      });
+      return res.send(responseUtil('ERROR', '삭제된 업무를 찾을 수 없습니다.', null))
     }
 
-    // 소프트 삭제된 업무 작성자 조회
-    const todo_writer = await workerModel.findOne({
-      where:{todo_id: todo_id}
-    });
+    // // 소프트 삭제된 업무 작성자 조회
+    // const todo_writer = await workerModel.findOne({
+    //   where:{todo_id: todo_id}
+    // });
     
-    // 삭제된 Worker들도 복구
-    await workerModel.update(
-      { is_deleted: false, deleted_at: null },
-      { where: { todo_id: todo_id, mem_id:todo_writer.mem_id } }
-    );
+    // // 삭제된 Worker들도 복구
+    // await workerModel.update(
+    //   { is_deleted: false, deleted_at: null },
+    //   { where: { todo_id: todo_id, mem_id:todo_writer.mem_id } }
+    // );
 
     // 업무 복구
     await todo.update({ is_deleted: false, deleted_at: null });
 
-    res.send({
-      status: "SUCCESS",
-      message: "업무가 복구되었습니다.",
-
-    })
-  } catch (err) {
-    console.error(err);
-    res.status(500).send({
-      status: "ERROR",
-      message: "업무 복구에 실패하였습니다.",
-      data: null,
-    });
+    res.send(responseUtil('SUCCESS', '업무가 복구되었습니다.', null));
+  } catch (error) {
+    console.log('restoreTodo Controller Err:', error);
+    res.send(responseUtil('ERROR', '업무 복구에 실패하였습니다.', null));
   }
 };
 
@@ -284,70 +295,14 @@ exports.patchTodoState = async (req, res) => {
     // 해당 업무 찾기
     const todo = await todoModel.findByPk(todo_id);
     if (!todo) {
-      return res.send(
-        responseUtil('ERROR', '해당 업무를 찾을 수 없습니다.', null)
-      );
+      return res.send(responseUtil('ERROR', '수정할 업무를 찾을 수 없습니다.', null));
     }
 
     // 상태 업데이트
     await todo.update({ state });
-    res.send(
-      responseUtil('SUCCESS', '업무 상태가 변경되었습니다.', {
-        id: todo.id,
-        state: todo.state,
-      })
-    );
-  } catch (err) {
-    console.error(err);
+    res.send(responseUtil('SUCCESS', '업무 상태가 변경되었습니다.', {id: todo.id,state: todo.state,}));
+  } catch (error) {
+    console.log('patchTodoState Controller Err:', error);
     res.send(responseUtil('ERROR', '업무 상태 변경에 실패하였습니다.', null));
-  }
-};
-
-
-
-// 업무 삭제 복구
-exports.restoreTodo = async (req, res) => {
-  try {
-    const { todo_id, space_id } = req.params;
-
-    // 삭제된 todo 찾기
-    const todo = await todoModel.findOne({
-      where: { space_id:space_id, todo_id: todo_id, is_deleted: true },
-    });
-
-    if (!todo) {
-      return res.status(404).send({
-        status: "ERROR",
-        message: "삭제된 업무를 찾을 수 없습니다.",
-        data: null,
-      });
-    }
-
-    // 소프트 삭제된 업무 작성자 조회
-    const todo_writer = await workerModel.findOne({
-      where:{todo_id: todo_id}
-    });
-    
-    // 삭제된 Worker들도 복구
-    await workerModel.update(
-      { is_deleted: false, deleted_at: null },
-      { where: { todo_id: todo_id, mem_id:todo_writer.mem_id } }
-    );
-
-    // 업무 복구
-    await todo.update({ is_deleted: false, deleted_at: null });
-
-    res.send({
-      status: "SUCCESS",
-      message: "업무가 복구되었습니다.",
-
-    })
-  } catch (err) {
-    console.error(err);
-    res.status(500).send({
-      status: "ERROR",
-      message: "업무 복구에 실패하였습니다.",
-      data: null,
-    });
   }
 };

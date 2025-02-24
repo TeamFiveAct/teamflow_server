@@ -5,8 +5,6 @@ const sendEmailMiddleware = require('../middlewares/emailMiddleware'); // 이메
 const nodemailer = require('nodemailer');
 const responseUtil = require('../utils/ResponseUtil');
 const crypto = require("crypto");
-const env = 'localDev';
-const config = require(__dirname + '/../config/config.json')[env];
 
 /*
 1. 워크스페이스 생성
@@ -21,7 +19,7 @@ exports.postSpaceCreate = async (req, res) => {
   try {
     let uniquePassword = await generateUniqueCode();
 
-    // 워크스페이스 생성성
+    // 워크스페이스 생성
     const workSpace = await workSpaceModel.create({
       space_title: req.body.space_title,
       space_description: req.body.space_description,
@@ -29,7 +27,7 @@ exports.postSpaceCreate = async (req, res) => {
       user_id: req.session.passport?.user?.user_id,
     });
 
-    // 생성한 워크스페이스에 생성자 추가가
+    // 생성한 워크스페이스에 생성자 추가
     const workSpaceMember = await workSpaceMemberModel.create({
       space_id: workSpace.space_id,
       user_id: req.session.passport?.user?.user_id,
@@ -59,13 +57,11 @@ async function generateUniqueCode() {
     const existingSpace = await workSpaceModel.findOne({
       where: { space_password: uniqueCode },
     });
-
     // DB 조회 반환값이 존재하지 않으면 재발급 중단
     if (!existingSpace) {
       isDuplicate = false;
     }
   }
-
   return uniqueCode;
 }
 
@@ -87,11 +83,9 @@ exports.getSpace = async (req, res) => {
         space_id: space_id,
       },
     });
-    res.send(
-      responseUtil('SUCCESS', '협업 조회성공', { ...workSpace.dataValues })
-    );
+    res.send(responseUtil('SUCCESS', '협업 조회성공', { ...workSpace.dataValues }));
   } catch (err) {
-    console.log('getWorkSpace Controller Err:', error);
+    console.log('getWorkSpace Controller Err:', err);
     res.send(responseUtil('ERROR', '협업 조회에 실패하였습니다.', null));
   }
 };
@@ -110,11 +104,7 @@ exports.getMySpace = async (req, res) => {
 
     // 참여한 워크스페이스가가 없으면 빈 배열 반환
     if (workSpaceMeber.length === 0) {
-      return res.json({
-        status: 'SUCCESS',
-        message: '참여한 워크스페이스가 없습니다.',
-        data: {},
-      });
+      return res.send(responseUtil('SUCCESS', '참여한 워크스페이스가 없습니다.', null));
     }
 
     // 내가 참여한 space_id 정보를 필터링
@@ -128,18 +118,10 @@ exports.getMySpace = async (req, res) => {
       attributes: ['space_id', 'space_title'],
     });
 
-    res.json({
-      status: 'SUCCESS',
-      message: '내가 참여한 협업 조회성공',
-      data: myWorkspcae,
-    });
-  } catch (err) {
-    console.log('getWorkSpace Controller Err:', err);
-    res.status(500).json({
-      status: 'ERROR',
-      message: '내가 참여한 협업 조회에 실패하였습니다.',
-      data: {},
-    });
+    res.send(responseUtil('SUCCESS', '내가 참여한 협업 조회성공', myWorkspcae));
+  } catch (error) {
+    console.log('getWorkSpace Controller Err:', error);
+    res.send(responseUtil('ERROR', '내가 참여한 협업 조회에 실패하였습니다.', null));
   }
 };
 
@@ -160,20 +142,13 @@ exports.getSpaceMember = async (req, res) => {
 
     // 참여자가 없으면 빈 배열 반환
     if (workSpaceMembers.length === 0) {
-      return res.json({
-        status: 'SUCCESS',
-        message: '해당 워크스페이스에 참여자가 없습니다.',
-        data: {},
-      });
+      return res.send(responseUtil('SUCCESS', '해당 워크스페이스에 참여자가 없습니다.', null));
     }
 
     const userList = workSpaceMembers.map(
       (member) => member.dataValues.user_id
     );
-    /**
-     * 전체 사용자 정보 조회
-     * {user_id, nickname}
-     */
+
     const members = await userModel.findAll({
       where: {
         user_id: userList,
@@ -181,22 +156,10 @@ exports.getSpaceMember = async (req, res) => {
       attributes: ['user_id', 'nickname'],
     });
 
-    res.json({
-      status: 'SUCCESS',
-      message: '전체 사용자 조회 성공',
-      data: members.map((member) => ({
-        space_id,
-        ...member.dataValues,
-      })),
-    });
-  } catch (err) {
-    console.error('postSpaceMember Controller Err:', err); // 에러 로그 수정
-
-    res.status(500).json({
-      status: 'ERROR',
-      message: '전체 사용자 조회 실패',
-      data: null,
-    });
+    return res.send(responseUtil('SUCCESS', '전체 사용자 조회 성공', members.map((member) => ({space_id, ...member.dataValues}))));
+  } catch (error) {
+    console.log('postSpaceMember Controller Err:', error);
+    res.send(responseUtil('ERROR', '전체 사용자 조회 실패', null));
   }
 };
 
@@ -222,14 +185,9 @@ exports.postSpaceJoin = async (req, res) => {
 
     // 비밀번호에 해당하는 워크스페이스가 없는 경우
     if (!findSpace) {
-      return res.send(
-        responseUtil(
-          'ERROR',
-          '워크스페이스 비밀번호가 일치하지 않습니다.',
-          null
-        )
-      );
+      return res.send(responseUtil('ERROR','워크스페이스 비밀번호가 일치하지 않습니다.',null));
     }
+
     const spaceId = findSpace.space_id;
     const existingMember = await workSpaceMemberModel.findOne({
       where: { space_id: spaceId, user_id: userId },
@@ -237,9 +195,7 @@ exports.postSpaceJoin = async (req, res) => {
 
     // 이미 가입되어있을 경우
     if (existingMember) {
-      return res.send(
-        responseUtil('ERROR', '이미 이 워크스페이스의 멤버입니다.', null)
-      );
+      return res.send(responseUtil('ERROR', '이미 이 워크스페이스의 멤버입니다.', null));
     }
 
     // 워크스페이스의 멤버로 가입
@@ -247,13 +203,10 @@ exports.postSpaceJoin = async (req, res) => {
       space_id: spaceId,
       user_id: userId,
     });
-    return res.send(
-      responseUtil('SUCCESS', '워크스페이스에 성공적으로 참여하였습니다.', null)
-    );
-  } catch (err) {
-    console.log('err', err);
-    // 서버 오류 발생시
-    return res.send(responseUtil('ERROR', '서버 오류가 발생했습니다.', null));
+    res.send(responseUtil('SUCCESS', '워크스페이스에 성공적으로 참여하였습니다.', null));
+  } catch (error) {
+    console.log('postSpaceJoin Controller Err:', error)
+    res.send(responseUtil('ERROR', '서버 오류가 발생했습니다.', null));
   }
 };
 
@@ -264,9 +217,7 @@ exports.postSpaceInvite = async (req, res, next) => {
     const { email } = req.body;
 
     if (!email || !space_id) {
-      return res
-        .status(400)
-        .json({ error: '이메일과 워크스페이스 ID가 필요합니다.' });
+      return res.send(responseUtil('ERROR','이메일과 워크스페이스 ID가 필요합니다.',null));
     }
 
     // 예제 초대 코드 (실제 서비스에서는 DB에서 가져오거나 생성해야 함)
@@ -284,7 +235,7 @@ exports.postSpaceInvite = async (req, res, next) => {
     req.body.subject = 'TeamFlow - 워크스페이스에 초대되었습니다!';
     req.body.to = email;
     req.body.text = `워크스페이스에 초대되었습니다. 초대 코드: ${inviteCode}`;
-    req.body.html = req.body.html = req.body.html = `
+    req.body.html = `
     <!DOCTYPE html>
     <html lang="ko">
     <head>
@@ -327,19 +278,12 @@ exports.postSpaceInvite = async (req, res, next) => {
     </html>
     `;
     
-    
-
     // 이메일 미들웨어 실행
     sendEmailMiddleware(req, res, () => {
-      res.status(200).json({
-        message: '초대 이메일이 전송되었습니다.',
-        emailStatus: req.emailStatus,
-      });
+      return res.send(responseUtil('SUCCESS','초대 이메일이 전송되었습니다.',{emailStatus: req.emailStatus}));
     });
   } catch (error) {
     console.error('초대 이메일 전송 오류:', error);
-    res.send(
-      responseUtil('ERROR', '초대 이메일 전송 중 오류가 발생했습니다.', null)
-    );
+    res.send(responseUtil('ERROR', '초대 이메일 전송 중 오류가 발생했습니다.', null));
   }
 };
