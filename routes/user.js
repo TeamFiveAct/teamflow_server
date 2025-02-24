@@ -266,7 +266,7 @@ router.get('/check-email', controller.getCheckEmail);
  *               email:
  *                 type: string
  *                 example: "test@test.com"
- *               password:
+ *               password_hash:
  *                 type: string
  *                 example: "qwer1234"
  *     responses:
@@ -476,7 +476,7 @@ router.get('/kakao/callback', controller.getKakaoCallback);
  *                   example: "ERROR"
  *                 message:
  *                   type: string
- *                   example: "로그인된 사용자가 없습니다."
+ *                   example: "로그인된 사용자가 아닙니다."
  *                 data:
  *                   type: object
  *                   nullable: true
@@ -501,11 +501,244 @@ router.get('/kakao/callback', controller.getKakaoCallback);
 // 이메일 기반 로그아웃
 router.post('/logout', controller.postLogout);
 
+/**
+ * @swagger
+ * /v1/user/kakao-logout:
+ *   post:
+ *     summary: 카카오 로그아웃
+ *     description: 현재 로그인된 사용자의 카카오 계정에서 로그아웃합니다. 세션과 쿠키도 삭제됩니다.
+ *     tags: [User]
+ *     responses:
+ *       200:
+ *         description: 카카오 로그아웃 성공 (세션 삭제됨)
+ *         headers:
+ *           Set-Cookie:
+ *             description: 세션 쿠키 삭제 (만료 처리됨)
+ *             schema:
+ *               type: string
+ *               example: "connect.sid=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "SUCCESS"
+ *                 message:
+ *                   type: string
+ *                   example: "카카오 로그아웃 성공했습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       401:
+ *         description: 로그인되지 않은 사용자 (세션이 없음)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "로그인 상태가 아닙니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       400:
+ *         description: 액세스 토큰이 존재하지 않음
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "액세스 토큰이 존재하지 않습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       500:
+ *         description: 카카오 로그아웃 요청 실패 또는 서버 오류
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "카카오 로그아웃 실패했습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ */
+
 // 카카오 로그아웃
 router.post('/kakao-logout', controller.postKakaoLogout);
 
+/**
+ * @swagger
+ * /v1/user/session:
+ *   get:
+ *     summary: 현재 로그인한 사용자 세션 확인
+ *     description: 현재 로그인된 사용자의 세션 정보를 확인합니다.
+ *     tags: [User]
+ *     responses:
+ *       200:
+ *         description: 세션이 존재하는 경우 (로그인된 사용자)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "SUCCESS"
+ *                 message:
+ *                   type: string
+ *                   example: "세션이 존재합니다."
+ *                 data:
+ *                   type: string
+ *                   example: "kakao or email"  # 로그인한 인증 제공자 (예: local, kakao 등)
+ *       401:
+ *         description: 세션이 존재하지 않는 경우 (로그인되지 않음)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "세션이 없습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       500:
+ *         description: 서버 오류 발생
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류가 발생했습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ */
 // 세션 여부 확인
 router.get('/session', controller.getSession);
+
+/**
+ * @swagger
+ * /v1/user:
+ *   delete:
+ *     summary: 회원 탈퇴 (이메일 & 카카오)
+ *     description: 로그인된 사용자의 계정을 소프트 삭제(soft delete)하고 세션을 삭제합니다. 카카오 로그인 사용자의 경우 카카오 서비스 연결 해제 후 탈퇴합니다.
+ *     tags: [User]
+ *     responses:
+ *       200:
+ *         description: 회원 탈퇴 성공 (소프트 삭제 + 세션 삭제됨)
+ *         headers:
+ *           Set-Cookie:
+ *             description: 세션 쿠키 삭제 (만료 처리됨)
+ *             schema:
+ *               type: string
+ *               example: "connect.sid=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "SUCCESS"
+ *                 message:
+ *                   type: string
+ *                   example: "이메일 or 카카오 회원 탈퇴가 완료되었습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       401:
+ *         description: 로그인되지 않은 사용자 (세션 없음)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "로그인 상태가 아닙니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       404:
+ *         description: 사용자를 찾을 수 없음
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "사용자를 찾을 수 없습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       400:
+ *         description: 카카오 액세스 토큰 없음 (카카오 사용자 탈퇴 실패)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "카카오 액세스 토큰을 찾을 수 없습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       500:
+ *         description: 서버 오류 발생
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류가 발생했습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ */
 
 // 회원탈퇴
 router.delete('/', controller.deleteMyInfo);
