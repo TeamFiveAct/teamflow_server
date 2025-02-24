@@ -745,6 +745,53 @@ router.delete('/', controller.deleteMyInfo);
 
 /**
  * @swagger
+ * /v1/user/kakao/callback:
+ *   get:
+ *     summary: 카카오 로그인 콜백
+ *     description: 카카오 로그인 후 자동으로 호출되어 사용자를 인증하고, 로그인 성공 시 사용자의 닉네임을 반환합니다.
+ *     tags: [User]
+ *     responses:
+ *       200:
+ *         description: 카카오 로그인 성공 또는 실패에 따른 응답
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "SUCCESS"  # 또는 "ERROR" (로그인 실패 시)
+ *                 message:
+ *                   type: string
+ *                   example: "카카오 로그인에 성공했습니다."  # 또는 "로그인 실패했습니다."
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     nickname:
+ *                       type: string
+ *                       example: "nickname123"
+ *                   nullable: true
+ *       500:
+ *         description: 서버 오류 발생
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류가 발생했습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ */
+router.get('/kakao/callback', controller.getKakaoCallback);
+
+/**
+ * @swagger
  * /v1/user/info:
  *   get:
  *     summary: 로그인 쿠키로 사용자 정보 조회

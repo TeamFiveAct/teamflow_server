@@ -10,12 +10,10 @@ const Message = sequelize.define(
       primaryKey: true,
       autoIncrement: true,
     },
-    // 기존 room_id를 workspace_id로 변경하여 해당 워크스페이스의 채팅방임을 명시
     workspace_id: {
       type: DataTypes.BIGINT,
       allowNull: false,
     },
-    // 기존 mem_id를 user_id로 변경
     user_id: {
       type: DataTypes.BIGINT,
       allowNull: false,
@@ -25,7 +23,8 @@ const Message = sequelize.define(
       allowNull: true,
     },
     content_type: {
-      type: DataTypes.ENUM('text', 'image', 'video', 'file'),
+      // 'code' 값 추가
+      type: DataTypes.ENUM('text', 'image', 'video', 'file', 'emoji', 'code'),
       allowNull: false,
       defaultValue: 'text',
     },
