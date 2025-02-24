@@ -24,6 +24,7 @@ User.hasOne(Workspace, {
 Workspace.belongsTo(User, {
   foreignKey: 'user_id',
   as: 'users',
+  onDelete: 'CASCADE',
 });
 
 // ─────────────────────────────────────────────────────────
@@ -32,6 +33,7 @@ Workspace.belongsTo(User, {
 WorkspaceMember.belongsTo(Workspace, {
   foreignKey: 'space_id',
   as: 'workspaces',
+  onDelete: 'CASCADE',
 });
 Workspace.hasMany(WorkspaceMember, {
   foreignKey: 'space_id',
@@ -44,6 +46,7 @@ Workspace.hasMany(WorkspaceMember, {
 ChatRoom.belongsTo(Workspace, {
   foreignKey: 'space_id',
   as: 'workspaces',
+  onDelete: 'CASCADE',
 });
 Workspace.hasOne(ChatRoom, {
   foreignKey: 'space_id',
@@ -56,6 +59,7 @@ Workspace.hasOne(ChatRoom, {
 Message.belongsTo(ChatRoom, {
   foreignKey: 'room_id',
   as: 'ChatRoom',
+  onDelete: 'CASCADE',
 });
 ChatRoom.hasMany(Message, {
   foreignKey: 'room_id',
@@ -68,6 +72,7 @@ ChatRoom.hasMany(Message, {
 Todo.belongsTo(Workspace, {
   foreignKey: 'space_id',
   as: 'Workspace',
+  onDelete: 'CASCADE',
 });
 Workspace.hasMany(Todo, {
   foreignKey: 'space_id',
@@ -81,6 +86,7 @@ Workspace.hasMany(Todo, {
 Worker.belongsTo(Todo, {
   foreignKey: 'todo_id',
   as: 'Todo',
+  onDelete: 'CASCADE',
 });
 Todo.hasMany(Worker, {
   foreignKey: 'todo_id',
@@ -102,6 +108,7 @@ Tag.belongsToMany(Todo, {
   foreignKey: 'tag_id',
   otherKey: 'todo_id',
   as: 'Todos',
+  onDelete: 'CASCADE',
 });
 
 // ─────────────────────────────────────────────────────────
@@ -112,6 +119,7 @@ Tag.belongsToMany(Todo, {
 PasswordReset.belongsTo(User, {
   foreignKey: 'user_id',
   as: 'user',
+  onDelete: 'CASCADE',
 });
 
 // 데이터베이스 동기화
