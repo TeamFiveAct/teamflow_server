@@ -7,10 +7,6 @@ const options = {
       title: 'Node.js API with Swagger',
       version: '1.0.0',
       description: 'TeamFlow 홈페이지의 Swagger 입니다.',
-<<<<<<< HEAD
-
-=======
->>>>>>> 5f2065e8dd5d9dee9ac536b705482c690ca9cda4
     },
     servers: [
       {
