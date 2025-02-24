@@ -90,6 +90,51 @@ exports.getSpace = async (req, res) => {
   }
 };
 
+// 워크스페이스 해체하기(호스트)
+exports.postSpaceDestroy = async (req, res) => {
+  try {
+    const { spaceId } = req.params.space_id;
+    const userId = req.session.passport?.user?.user_id;
+    const workSpace = await workSpaceModel.findOne({
+      where: {
+        space_id: spaceId,
+        user_id: userId
+      },
+    });
+    res.send(responseUtil('SUCCESS', '협업 삭제 성공', { ...workSpace.dataValues }));
+  } catch (error) {
+    console.log('postSpaceDestroy Controller Err:', error);
+    res.send(responseUtil('ERROR', '협업 삭제 실패하였습니다.', null));
+  }
+}
+
+// 워크스페이스 탈퇴(참여자)
+exports.postSpaceMemberOut = async (req, res) => {
+  try {
+    const spaceId = req.params.space_id;
+    const user_id = req.session.passport?.user?.user_id;
+
+    const workSpaceMeber = await workSpaceMemberModel.findAll({
+      where: {
+        space_id: spaceId,
+        user_id: user_id,
+      },
+    });
+
+    // 참여한 워크스페이스가가 없으면 빈 배열 반환
+    if (workSpaceMeber.length === 0) {
+      return res.send(responseUtil('SUCCESS', '참여한 워크스페이스가 없습니다.', null));
+    }
+
+    // 참여한 워크스페이스 삭제 처리
+    res.send(responseUtil('SUCCESS', '워크스페이스 탈퇴 성공', myWorkspace));
+  } catch (error) {
+    console.log('postSpaceMemberOut Controller Err:', error);
+    res.send(responseUtil('ERROR', '워크스페이스 탈퇴에 실패하였습니다.', null));
+  }
+}
+
+
 // 개인별(내가) 참여한 워크스페이스 전체 조회
 exports.getMySpace = async (req, res) => {
   try {
@@ -102,7 +147,7 @@ exports.getMySpace = async (req, res) => {
       attributes: ['space_id'],
     });
 
-    // 참여한 워크스페이스가가 없으면 빈 배열 반환
+    // 참여한 워크스페이스가 없으면 빈 배열 반환
     if (workSpaceMeber.length === 0) {
       return res.send(responseUtil('SUCCESS', '참여한 워크스페이스가 없습니다.', null));
     }
@@ -111,14 +156,14 @@ exports.getMySpace = async (req, res) => {
     const myspace = workSpaceMeber.map((item) => item.space_id);
 
     // 내가 속한 space_id 로 전체 워크스페이스 정보 조회
-    const myWorkspcae = await workSpaceModel.findAll({
+    const myWorkspace = await workSpaceModel.findAll({
       where: {
         space_id: myspace,
       },
       attributes: ['space_id', 'space_title'],
     });
 
-    res.send(responseUtil('SUCCESS', '내가 참여한 협업 조회성공', myWorkspcae));
+    res.send(responseUtil('SUCCESS', '내가 참여한 협업 조회성공', myWorkspace));
   } catch (error) {
     console.log('getWorkSpace Controller Err:', error);
     res.send(responseUtil('ERROR', '내가 참여한 협업 조회에 실패하였습니다.', null));
