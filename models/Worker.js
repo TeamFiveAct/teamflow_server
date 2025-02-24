@@ -18,15 +18,6 @@ const Worker = sequelize.define(
       type: DataTypes.BIGINT,
       allowNull: true, // FK (workspace_members.mem_id)
     },
-    //소프트 딜리트 관련
-    is_deleted: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
-    deleted_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
   },
   {
     tableName: 'worker', // 혹은 'workers'
