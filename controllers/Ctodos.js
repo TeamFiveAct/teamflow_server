@@ -197,6 +197,25 @@ exports.deleteTodo = async (req, res) => {
   }
 };
 
+//소프트 삭제된 업무 리스트
+exports.postSoftDelList = async (req, res) => {
+  try{
+    const {space_id } = req.params;
+    const user_id = req.session.passport?.user?.user_id;
+    // 삭제 전 삭제할 데이터가 존재하는지 확인인
+    const todo = await todoModel.findAll({
+      where:{
+        space_id:space_id,
+        user_id:user_id
+      }
+    });
+    res.send(responseUtil('SUCCESS', '업무가 성공적으로 불러왔습니다', null));
+  }catch(error){
+    console.log('postSoftDelList Controller Err:', error);
+    res.send(responseUtil('ERROR', '삭제한 업무 리스트를 불러오는데 실패했습니다', null));
+  }
+};
+
 // 업무 하드 삭제 (완전히 DB에서 제거)
 exports.deleteHardDeleteTodo = async (req, res) => {
   try {
