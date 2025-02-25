@@ -1,6 +1,7 @@
 const workSpaceModel = require('../models/Workspace');
 const userModel = require('../models/User');
 const workSpaceMemberModel = require('../models/WorkspaceMember');
+const chatRoomModel = require('../models/ChatRoom');
 const sendEmailMiddleware = require('../middlewares/emailMiddleware'); // 이메일 미들웨어
 const nodemailer = require('nodemailer');
 const responseUtil = require('../utils/ResponseUtil');
@@ -32,6 +33,11 @@ exports.postSpaceCreate = async (req, res) => {
     const workSpaceMember = await workSpaceMemberModel.create({
       space_id: workSpace.space_id,
       user_id: req.session.passport?.user?.user_id,
+    });
+
+    // 워크스페이스의 채팅방 생성
+    const chatRoom = await chatRoomModel.create({
+      workspace_id: workSpace.space_id
     });
 
     res.send(
