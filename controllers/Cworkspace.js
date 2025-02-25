@@ -24,6 +24,7 @@ exports.postSpaceCreate = async (req, res) => {
     await workSpaceMemberModel.create({
       space_id: workSpace.space_id,
       user_id: userId
+    });
 
     // 워크스페이스의 채팅방 생성
     const chatRoom = await chatRoomModel.create({
