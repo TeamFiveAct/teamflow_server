@@ -3,23 +3,15 @@ const userModel = require('../models/User');
 const workSpaceMemberModel = require('../models/WorkspaceMember');
 const chatRoomModel = require('../models/ChatRoom');
 const sendEmailMiddleware = require('../middlewares/emailMiddleware'); // 이메일 미들웨어
-const nodemailer = require('nodemailer');
 const responseUtil = require('../utils/ResponseUtil');
 const crypto = require("crypto");
 const WorkspaceMember = require('../models/WorkspaceMember');
-
-/*
-1. 워크스페이스 생성
-2. 워크스페이스 조회
-3. 특정 워크스페이스 조회
-4. 개인별(나의) 워크 스페이스 조회회
-5. 특정 워크스페이스의 참여한 참여자 조회
-*/
 
 // 워크스페이스 생성
 exports.postSpaceCreate = async (req, res) => {
   try {
     let uniquePassword = await generateUniqueCode();
+    const userId = req.session.passport?.user?.user_id;
 
     // 워크스페이스 생성
     const workSpace = await workSpaceModel.create({
@@ -30,9 +22,9 @@ exports.postSpaceCreate = async (req, res) => {
     });
 
     // 생성한 워크스페이스에 생성자 추가
-    const workSpaceMember = await workSpaceMemberModel.create({
+    await workSpaceMemberModel.create({
       space_id: workSpace.space_id,
-      user_id: req.session.passport?.user?.user_id,
+      user_id: userId
     });
 
     // 워크스페이스의 채팅방 생성
@@ -84,10 +76,10 @@ function createPasswordCode() {
 // 특정 워크스페이스 조회
 exports.getSpace = async (req, res) => {
   try {
-    const { space_id } = req.params;
+    const spaceId = req.params.space_id;
     const workSpace = await workSpaceModel.findOne({
       where: {
-        space_id: space_id,
+        space_id: spaceId,
       },
     });
     res.send(responseUtil('SUCCESS', '워크스페이스 조회성공', { ...workSpace.dataValues }));
@@ -117,7 +109,7 @@ exports.postSpaceDestroy = async (req, res) => {
     // 워크스페이스 해체
     await workSpace.destroy();
 
-    res.send(responseUtil('SUCCESS', '워크스페이스 삭제 완료', null));
+    res.send(responseUtil('SUCCESS', '워크스페이스 삭제 하였습니다.', null));
   } catch (error) {
     console.log('postSpaceDestroy Controller Err:', error);
     res.send(responseUtil('ERROR', '워크스페이스 삭제 실패하였습니다.', null));
@@ -128,12 +120,12 @@ exports.postSpaceDestroy = async (req, res) => {
 exports.postSpaceLeave = async (req, res) => {
   try {
     const spaceId = req.params.space_id;
-    const user_id = req.session.passport?.user?.user_id;
+    const userId = req.session.passport?.user?.user_id;
 
     const workSpaceMember = await workSpaceMemberModel.findOne({
       where: {
         space_id: spaceId,
-        user_id: user_id,
+        user_id: userId,
       },
     });
 
@@ -161,22 +153,20 @@ exports.postSpaceLeave = async (req, res) => {
   }
 }
 
-
 // 개인별(내가) 참여한 워크스페이스 전체 조회
 exports.getMySpace = async (req, res) => {
   try {
     // 세션의 고유번호
-    const user_id = req.session.passport?.user?.user_id;
+    const userId = req.session.passport?.user?.user_id;
     const workSpaceMeber = await workSpaceMemberModel.findAll({
       where: {
-        user_id: user_id,
+        user_id: userId,
       },
       attributes: ['space_id'],
     });
 
     // 참여한 워크스페이스가 없으면 빈 배열 반환
     if (workSpaceMeber.length === 0) return res.send(responseUtil('SUCCESS', '참여한 워크스페이스가 없습니다.', null));
-
 
     // 내가 참여한 space_id 정보를 필터링
     const myspace = workSpaceMeber.map((item) => item.space_id);
@@ -199,7 +189,7 @@ exports.getMySpace = async (req, res) => {
 // 특정 워크스페이스에 참여한 참여자 전체 조회
 exports.getSpaceMember = async (req, res) => {
   try {
-    const { space_id } = req.params;
+    const spaceId = req.params.space_id;
 
     /**
      * 특정 협업에 속한 참여자 정보 조회
@@ -207,7 +197,7 @@ exports.getSpaceMember = async (req, res) => {
      */
     const workSpaceMembers = await workSpaceMemberModel.findAll({
       where: {
-        space_id: space_id,
+        space_id: spaceId,
       },
     });
 
@@ -216,10 +206,7 @@ exports.getSpaceMember = async (req, res) => {
       return res.send(responseUtil('SUCCESS', '해당 워크스페이스에 참여자가 없습니다.', null));
     }
 
-    const userList = workSpaceMembers.map(
-      (member) => member.dataValues.user_id
-    );
-
+    const userList = workSpaceMembers.map((member) => member.dataValues.user_id);
     const members = await userModel.findAll({
       where: {
         user_id: userList,
@@ -241,23 +228,17 @@ exports.postSpaceJoin = async (req, res) => {
     const userId = req.session.passport?.user?.user_id;
 
     // 세션에 user_id가 없을 경우
-    if (!userId) {
-      return res.send(responseUtil('ERROR', '로그인이 필요합니다', null));
-    }
+    if (!userId) return res.send(responseUtil('ERROR', '로그인이 필요합니다', null));
 
     // 워크스페이스 비밀번호가 올바르지 않은 경우
-    if (!space_password) {
-      return res.send(responseUtil('ERROR', '비밀번호를 입력해주세요.', null));
-    }
+    if (!space_password) return res.send(responseUtil('ERROR', '비밀번호를 입력해주세요.', null));
 
     const findSpace = await workSpaceModel.findOne({
       where: { space_password },
     });
 
     // 비밀번호에 해당하는 워크스페이스가 없는 경우
-    if (!findSpace) {
-      return res.send(responseUtil('ERROR','워크스페이스 비밀번호가 일치하지 않습니다.',null));
-    }
+    if (!findSpace) return res.send(responseUtil('ERROR','워크스페이스 비밀번호가 일치하지 않습니다.',null));
 
     const spaceId = findSpace.space_id;
     const existingMember = await workSpaceMemberModel.findOne({
@@ -265,9 +246,7 @@ exports.postSpaceJoin = async (req, res) => {
     });
 
     // 이미 가입되어있을 경우
-    if (existingMember) {
-      return res.send(responseUtil('ERROR', '이미 이 워크스페이스의 멤버입니다.', null));
-    }
+    if (existingMember) return res.send(responseUtil('ERROR', '이미 이 워크스페이스의 멤버입니다.', null));
 
     // 워크스페이스의 멤버로 가입
     await workSpaceMemberModel.create({
@@ -284,12 +263,10 @@ exports.postSpaceJoin = async (req, res) => {
 // 협업초대 메일발송
 exports.postSpaceInvite = async (req, res, next) => {
   try {
-    const { space_id } = req.params;
+    const spaceId = req.params.space_id;
     const { email } = req.body;
 
-    if (!email || !space_id) {
-      return res.send(responseUtil('ERROR','이메일과 워크스페이스 ID가 필요합니다.',null));
-    }
+    if (!email || !space_id) return res.send(responseUtil('ERROR','이메일과 워크스페이스 ID가 필요합니다.',null));
 
     // 예제 초대 코드 (실제 서비스에서는 DB에서 가져오거나 생성해야 함)
     const workSpace = await workSpaceModel.findOne({
