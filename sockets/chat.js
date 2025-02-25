@@ -1,5 +1,4 @@
-// sockets/chat.js
-const { Message, ChatRoom, WorkspaceMember } = require('../models');
+const { Message, ChatRoom, WorkspaceMember, User } = require('../models');
 
 module.exports = (io) => {
   io.on('connection', (socket) => {
@@ -39,11 +38,16 @@ module.exports = (io) => {
       socket.join(workspace_id.toString());
       console.log(`user_id=${user_id} 님이 workspace_id=${workspace_id} 채팅방에 입장`);
 
-      // 과거 채팅 기록 불러오기 (생성순 ASC)
+      // 과거 채팅 기록 불러오기 (생성순 ASC) – 사용자 닉네임과 프로필 이미지 포함
       try {
         const messages = await Message.findAll({
           where: { workspace_id },
-          order: [['created_at', 'ASC']]
+          order: [['created_at', 'ASC']],
+          include: [{
+            model: User,
+            as: 'user',
+            attributes: ['nickname', 'profile_image']
+          }]
         });
         socket.emit('chatHistory', messages);
       } catch (error) {
@@ -63,8 +67,19 @@ module.exports = (io) => {
       try {
         // 메시지를 DB에 저장
         const savedMessage = await Message.create(messageObj);
+        
+        // 저장된 메시지를 사용자 정보와 함께 다시 조회
+        const messageWithUser = await Message.findOne({
+          where: { chat_id: savedMessage.chat_id },
+          include: [{
+            model: User,
+            as: 'user',
+            attributes: ['nickname', 'profile_image']
+          }]
+        });
+        
         // 해당 워크스페이스의 채팅방에 메시지 브로드캐스트
-        io.to(workspace_id.toString()).emit('receiveMessage', savedMessage);
+        io.to(workspace_id.toString()).emit('receiveMessage', messageWithUser);
       } catch (error) {
         console.error('메시지 전송 중 오류:', error);
       }

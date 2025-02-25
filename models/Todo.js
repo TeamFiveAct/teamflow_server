@@ -23,9 +23,9 @@ const Todo = sequelize.define(
       allowNull: true,
     },
     priority: {
-      type: DataTypes.ENUM("low", "medium", "high","very_high"),
+      type: DataTypes.ENUM("small", "medium", "high","very_high"),
       allowNull: false,
-      defaultValue: "low",
+      defaultValue: "small",
     },
     start_date: {
       type: DataTypes.DATEONLY,
