@@ -1,9 +1,11 @@
 const workSpaceModel = require('../models/Workspace');
 const userModel = require('../models/User');
 const workSpaceMemberModel = require('../models/WorkspaceMember');
+const chatRoomModel = require('../models/ChatRoom');
 const sendEmailMiddleware = require('../middlewares/emailMiddleware'); // 이메일 미들웨어
 const responseUtil = require('../utils/ResponseUtil');
 const crypto = require("crypto");
+const WorkspaceMember = require('../models/WorkspaceMember');
 
 // 워크스페이스 생성
 exports.postSpaceCreate = async (req, res) => {
@@ -23,6 +25,11 @@ exports.postSpaceCreate = async (req, res) => {
     await workSpaceMemberModel.create({
       space_id: workSpace.space_id,
       user_id: userId
+    });
+
+    // 워크스페이스의 채팅방 생성
+    const chatRoom = await chatRoomModel.create({
+      workspace_id: workSpace.space_id
     });
 
     res.send(
@@ -145,7 +152,6 @@ exports.postSpaceLeave = async (req, res) => {
     res.send(responseUtil('ERROR', '워크스페이스 탈퇴에 실패하였습니다.', null));
   }
 }
-
 
 // 개인별(내가) 참여한 워크스페이스 전체 조회
 exports.getMySpace = async (req, res) => {
