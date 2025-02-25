@@ -47,10 +47,6 @@ router.post("/statelodeed",isAuthenticated, controller.postTodoStateList);
 
 
 
-
-router.post("/statelodeed",isAuthenticated, controller.postTodoStateList);
-
-
 /**
  * @swagger
  * /todos/add:
