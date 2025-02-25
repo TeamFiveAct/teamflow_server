@@ -158,11 +158,16 @@ exports.getKakaoCallback = (req, res, next) => {
       req.session.save((err) => {
         if (err) return next(err);
 
-        return res.send(
-          responseUtil('SUCCESS', '카카오 로그인에 성공했습니다.', {
-            nickname: user.nickname,
-          })
-        );
+        res.send(`
+          <script>
+            window.opener.postMessage({
+              status : 'SUCCESS',
+              message : '카카오 로그인에 성공했습니다.',
+              data : { nickname : '${user.nickname}'}
+            }, '*');
+            window.close();
+          </script>
+          `);
       });
     });
   })(req, res, next);
