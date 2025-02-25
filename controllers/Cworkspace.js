@@ -5,7 +5,6 @@ const chatRoomModel = require('../models/ChatRoom');
 const sendEmailMiddleware = require('../middlewares/emailMiddleware'); // 이메일 미들웨어
 const responseUtil = require('../utils/ResponseUtil');
 const crypto = require("crypto");
-const WorkspaceMember = require('../models/WorkspaceMember');
 
 // 워크스페이스 생성
 exports.postSpaceCreate = async (req, res) => {
@@ -25,7 +24,6 @@ exports.postSpaceCreate = async (req, res) => {
     await workSpaceMemberModel.create({
       space_id: workSpace.space_id,
       user_id: userId
-    });
 
     // 워크스페이스의 채팅방 생성
     const chatRoom = await chatRoomModel.create({
@@ -307,7 +305,6 @@ exports.postSpaceInvite = async (req, res, next) => {
     
           <!-- 이동 버튼 -->
           <p style="text-align: center;">
-            <!-- 워크스페이스로 이동할 URL을 href 속성에 넣어주세요 -->
             <a href="https://your-workspace-url.com"
                style="display: inline-block; padding: 12px 24px; background-color: #007bff; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; margin: 0 auto;">
               워크스페이스로 이동
