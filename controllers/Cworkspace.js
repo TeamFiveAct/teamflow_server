@@ -146,7 +146,6 @@ exports.postSpaceLeave = async (req, res) => {
   }
 }
 
-
 // 개인별(내가) 참여한 워크스페이스 전체 조회
 exports.getMySpace = async (req, res) => {
   try {
@@ -301,7 +300,6 @@ exports.postSpaceInvite = async (req, res, next) => {
     
           <!-- 이동 버튼 -->
           <p style="text-align: center;">
-            <!-- 워크스페이스로 이동할 URL을 href 속성에 넣어주세요 -->
             <a href="https://your-workspace-url.com"
                style="display: inline-block; padding: 12px 24px; background-color: #007bff; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; margin: 0 auto;">
               워크스페이스로 이동

@@ -382,7 +382,6 @@ exports.patchTodoState = async (req, res) => {
   }
 };
 
-
 //현재 워크스페이스에 참여한 유저인지 검증
 async function workSpaceUserVerification(spaceId, userId) {
   const spaceMember = await workSpaceMemberModel.findOne({
