@@ -267,6 +267,9 @@ router.get('/:space_id', isAuthenticated, controller.getSpace);
  */
 router.get('/:space_id/member', isAuthenticated, controller.getSpaceMember);
 
+router.post('/:space_id/destroy', isAuthenticated, controller.postSpaceDestroy);
+router.post('/:space_id/leave', isAuthenticated, controller.postSpaceLeave);
+
 // // 워크스페이스 생성
 // router.post("/", isAuthenticated, controller.postSpaceCreate);
 // // 현재 사용자가 참여한 모든 워크스페이스 조회 (GET)

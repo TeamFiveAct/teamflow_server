@@ -6,6 +6,7 @@ const sendEmailMiddleware = require('../middlewares/emailMiddleware'); // 이메
 const nodemailer = require('nodemailer');
 const responseUtil = require('../utils/ResponseUtil');
 const crypto = require("crypto");
+const WorkspaceMember = require('../models/WorkspaceMember');
 
 /*
 1. 워크스페이스 생성
@@ -89,12 +90,77 @@ exports.getSpace = async (req, res) => {
         space_id: space_id,
       },
     });
-    res.send(responseUtil('SUCCESS', '협업 조회성공', { ...workSpace.dataValues }));
+    res.send(responseUtil('SUCCESS', '워크스페이스 조회성공', { ...workSpace.dataValues }));
   } catch (err) {
     console.log('getWorkSpace Controller Err:', err);
-    res.send(responseUtil('ERROR', '협업 조회에 실패하였습니다.', null));
+    res.send(responseUtil('ERROR', '워크스페이스 조회에 실패하였습니다.', null));
   }
 };
+
+// 워크스페이스 해체하기(호스트)
+exports.postSpaceDestroy = async (req, res) => {
+  try {
+    const spaceId = req.params.space_id;
+    const userId = req.session.passport?.user?.user_id;
+
+    const workSpace = await workSpaceModel.findOne({
+      where: {
+        space_id: spaceId,
+      },
+      attributes: ['space_id','user_id'],
+    });
+
+    // 조회한 값이 없을때
+    if (!workSpace) return res.send(responseUtil('ERROR', '해당 워크스페이스를 찾을 수 없습니다.', null));
+    // 호스트가 맞는지
+    if (workSpace.user_id !== userId){ return res.send(responseUtil('ERROR', '호스트만 워크스페이스 해체를 할 수 있습니다.', null));}
+    // 워크스페이스 해체
+    await workSpace.destroy();
+
+    res.send(responseUtil('SUCCESS', '워크스페이스 삭제 완료', null));
+  } catch (error) {
+    console.log('postSpaceDestroy Controller Err:', error);
+    res.send(responseUtil('ERROR', '워크스페이스 삭제 실패하였습니다.', null));
+  }
+}
+
+// 워크스페이스 탈퇴(참여자)
+exports.postSpaceLeave = async (req, res) => {
+  try {
+    const spaceId = req.params.space_id;
+    const user_id = req.session.passport?.user?.user_id;
+
+    const workSpaceMember = await workSpaceMemberModel.findOne({
+      where: {
+        space_id: spaceId,
+        user_id: user_id,
+      },
+    });
+
+    const workSpace = await workSpaceModel.findOne({
+      where: {
+        space_id: spaceId,
+      },
+      attributes: ['user_id'],
+    });
+    
+    // 탈퇴 하려는 워크스페이스의 멤버가 아닐때
+    if (!workSpaceMember) return res.send(responseUtil('SUCCESS', '참여한 워크스페이스가 없습니다.', null));
+
+    // 탈퇴 요청사용자가 호스트인지 검증
+    if (workSpace.user_id === user_id) return res.send(responseUtil('ERROR', '호스트는 탈퇴가 불가능합니다', null));
+    
+    // 탈퇴처리
+    await workSpaceMember.destroy();
+
+    // 참여한 워크스페이스 삭제 처리
+    res.send(responseUtil('SUCCESS', '워크스페이스 탈퇴 하였습니다.', null));
+  } catch (error) {
+    console.log('postSpaceMemberOut Controller Err:', error);
+    res.send(responseUtil('ERROR', '워크스페이스 탈퇴에 실패하였습니다.', null));
+  }
+}
+
 
 // 개인별(내가) 참여한 워크스페이스 전체 조회
 exports.getMySpace = async (req, res) => {
@@ -108,26 +174,25 @@ exports.getMySpace = async (req, res) => {
       attributes: ['space_id'],
     });
 
-    // 참여한 워크스페이스가가 없으면 빈 배열 반환
-    if (workSpaceMeber.length === 0) {
-      return res.send(responseUtil('SUCCESS', '참여한 워크스페이스가 없습니다.', null));
-    }
+    // 참여한 워크스페이스가 없으면 빈 배열 반환
+    if (workSpaceMeber.length === 0) return res.send(responseUtil('SUCCESS', '참여한 워크스페이스가 없습니다.', null));
+
 
     // 내가 참여한 space_id 정보를 필터링
     const myspace = workSpaceMeber.map((item) => item.space_id);
 
     // 내가 속한 space_id 로 전체 워크스페이스 정보 조회
-    const myWorkspcae = await workSpaceModel.findAll({
+    const myWorkspace = await workSpaceModel.findAll({
       where: {
         space_id: myspace,
       },
       attributes: ['space_id', 'space_title'],
     });
 
-    res.send(responseUtil('SUCCESS', '내가 참여한 협업 조회성공', myWorkspcae));
+    res.send(responseUtil('SUCCESS', '내가 참여한 워크스페이스 조회성공', myWorkspace));
   } catch (error) {
     console.log('getWorkSpace Controller Err:', error);
-    res.send(responseUtil('ERROR', '내가 참여한 협업 조회에 실패하였습니다.', null));
+    res.send(responseUtil('ERROR', '내가 참여한 워크스페이스 조회에 실패하였습니다.', null));
   }
 };
 
