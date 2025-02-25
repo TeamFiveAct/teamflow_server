@@ -48,9 +48,6 @@ router.post("/statelodeed",isAuthenticated, controller.postTodoStateList);
 
 
 
-router.post("/statelodeed",isAuthenticated, controller.postTodoStateList);
-
-
 /**
  * @swagger
  * /todos/add:
@@ -231,23 +228,6 @@ router.patch('/restore/:todo_id', isAuthenticated, controller.restoreTodo);
  */
 router.patch('/state/:todo_id', isAuthenticated, controller.patchTodoState);
 
-// // 전체 업무 리스트 조회
-// router.post("/", isAuthenticated, controller.postTodoList);
-// // 업무 생성
-// router.post("/add", isAuthenticated, controller.postTodoCreate);
-// // 특정 업무 조회
-// router.post("/view/:todo_id",isAuthenticated, controller.postTodo);
-// // 업무 수정
-// router.patch("/:todo_id",isAuthenticated, controller.patchTodo);
-// // 업무 소프트 삭제
-// router.delete("/:todo_id",isAuthenticated, controller.deleteTodo);
-// // 업무 하드 삭제
-// router.delete("/permanent/:todo_id",isAuthenticated, controller.deleteHardDeleteTodo);
-// // 소프트 삭제 복구
-// router.patch("/restore/:todo_id",isAuthenticated, controller.restoreTodo);
-// // 업무 상태 변경
-// router.patch("/state/:todo_id",isAuthenticated, controller.patchTodoState);
-// // 소프트 딜리트된 업무 복구
-// router.patch("/restore/:todo_id",isAuthenticated, controller.restoreTodo);
+
 
 module.exports = router;

@@ -90,6 +90,12 @@ exports.getSpace = async (req, res) => {
         space_id: space_id,
       },
     });
+
+    // 워크스페이스가 없는 경우 처리
+    if (!workSpace) {
+      return res.send(responseUtil('ERROR', '워크스페이스를 찾을 수 없습니다.', null));
+    }
+
     res.send(responseUtil('SUCCESS', '워크스페이스 조회성공', { ...workSpace.dataValues }));
   } catch (err) {
     console.log('getWorkSpace Controller Err:', err);
@@ -144,11 +150,20 @@ exports.postSpaceLeave = async (req, res) => {
       attributes: ['user_id'],
     });
     
+    // 워크스페이스가 없는 경우 처리
+    if (!workSpace) {
+      return res.send(responseUtil('ERROR', '워크스페이스를 찾을 수 없습니다.', null));
+    }
+    
     // 탈퇴 하려는 워크스페이스의 멤버가 아닐때
-    if (!workSpaceMember) return res.send(responseUtil('SUCCESS', '참여한 워크스페이스가 없습니다.', null));
+    if (!workSpaceMember) {
+      return res.send(responseUtil('SUCCESS', '참여한 워크스페이스가 없습니다.', null));
+    }
 
     // 탈퇴 요청사용자가 호스트인지 검증
-    if (workSpace.user_id === user_id) return res.send(responseUtil('ERROR', '호스트는 탈퇴가 불가능합니다', null));
+    if (workSpace.user_id === user_id) {
+      return res.send(responseUtil('ERROR', '호스트는 탈퇴가 불가능합니다', null));
+    }
     
     // 탈퇴처리
     await workSpaceMember.destroy();
@@ -200,6 +215,17 @@ exports.getMySpace = async (req, res) => {
 exports.getSpaceMember = async (req, res) => {
   try {
     const { space_id } = req.params;
+
+    // 워크스페이스 존재 여부 확인
+    const workSpace = await workSpaceModel.findOne({
+      where: {
+        space_id: space_id,
+      },
+    });
+
+    if (!workSpace) {
+      return res.send(responseUtil('ERROR', '워크스페이스를 찾을 수 없습니다.', null));
+    }
 
     /**
      * 특정 협업에 속한 참여자 정보 조회
@@ -297,7 +323,12 @@ exports.postSpaceInvite = async (req, res, next) => {
         space_id: space_id
       },
       attributes: ['space_password','space_title']
-    })
+    });
+
+    // 워크스페이스가 없는 경우 처리
+    if (!workSpace) {
+      return res.send(responseUtil('ERROR', '워크스페이스를 찾을 수 없습니다.', null));
+    }
 
     const workSpaceTitle = workSpace.space_title;
     const inviteCode = workSpace.space_password;

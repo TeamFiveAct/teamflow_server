@@ -23,7 +23,7 @@ const Todo = sequelize.define(
       allowNull: true,
     },
     priority: {
-      type: DataTypes.ENUM("low", "medium", "high"),
+      type: DataTypes.ENUM("low", "medium", "high","very_high"),
       allowNull: false,
       defaultValue: "low",
     },

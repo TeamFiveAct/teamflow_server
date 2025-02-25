@@ -96,8 +96,27 @@ const io = new Server(server, {
   },
 });
 
-const chatSocket = require('./sockets/chat');
-chatSocket(io);
+const socketHandler = require('./sockets');
+socketHandler(io);
+
+// 소켓 상태 확인 엔드포인트
+app.get('/socket/status', (req, res) => {
+  res.json(io.getStatus());
+});
+
+// 워크스페이스 접속자 목록 조회
+app.get('/v1/workspace/:workspace_id/users/online', (req, res) => {
+  const { workspace_id } = req.params;
+  const roomName = `workspace:${workspace_id}`;
+  const workspaceStatus = io.getWorkspaceStatus();
+  
+  const workspace = workspaceStatus.workspaces.find(w => w.name === roomName);
+  if (!workspace) {
+    return res.json({ users: [] });
+  }
+  
+  res.json({ users: workspace.users });
+});
 
 server.listen(PORT, () => {
   console.log(

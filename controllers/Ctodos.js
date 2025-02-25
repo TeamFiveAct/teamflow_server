@@ -100,25 +100,25 @@ exports.postTodoCreate = async (req, res) => {
       priority: req.body.priority,
       start_date: req.body.start_date,
       due_date: req.body.due_date,
+      status: req.body.status // 추가: 프론트엔드에서 전달받은 status 사용
     });
-
 
     // 해당 워크스페이스 멤버 조회
     const spaceMember = await workSpaceMemberModel.findOne({
-      where:{
+      where: {
         space_id: req.params.space_id,
         user_id: req.session.passport?.user?.user_id
       }
-    })
+    });
 
     // 업무 참여자 생성
-    const worker = await workerModel.create({
+    await workerModel.create({
       todo_id: todo.todo_id,
       mem_id: spaceMember.mem_id
     });
 
-
-    res.send(responseUtil('SUCCESS', '업무생성 성공했습니다.', null));
+    // 생성된 업무 정보를 응답 데이터로 반환
+    res.send(responseUtil('SUCCESS', '업무생성 성공했습니다.', todo.dataValues));
   } catch (error) {
     console.log('postTodoCreate Controller Err:', error);
     res.send(responseUtil('ERROR', '업무 생성에 실패하였습니다.', null));
@@ -309,7 +309,10 @@ exports.restoreTodo = async (req, res) => {
 exports.patchTodoState = async (req, res) => {
   try {
     const { todo_id } = req.params;
-    const { state } = req.body; // 변경할 상태 값
+    const { status } = req.body; // 클라이언트에서 status를 보내므로 추출
+
+    console.log('Request todo_id:', todo_id);
+    console.log('Requested status:', status);
 
     // 해당 업무 찾기
     const todo = await todoModel.findByPk(todo_id);
@@ -317,9 +320,14 @@ exports.patchTodoState = async (req, res) => {
       return res.send(responseUtil('ERROR', '수정할 업무를 찾을 수 없습니다.', null));
     }
 
-    // 상태 업데이트
-    await todo.update({ state });
-    res.send(responseUtil('SUCCESS', '업무 상태가 변경되었습니다.', {id: todo.id,state: todo.state,}));
+    // 상태 업데이트 (모델의 컬럼명이 status임)
+    await todo.update({ status });
+    
+    // 업데이트 후 재조회
+    const updatedTodo = await todoModel.findByPk(todo_id);
+    console.log('Updated Todo:', updatedTodo);
+
+    res.send(responseUtil('SUCCESS', '업무 상태가 변경되었습니다.', updatedTodo));
   } catch (error) {
     console.log('patchTodoState Controller Err:', error);
     res.send(responseUtil('ERROR', '업무 상태 변경에 실패하였습니다.', null));
