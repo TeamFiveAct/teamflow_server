@@ -18,6 +18,8 @@ const { swaggerUi, specs } = require('./swagger');
 
 const app = express();
 require('dotenv').config();
+const cron = require('node-cron');
+const deleteOldUsers = require('./utils/deleteOldUsers');
 const PORT = 8000;
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
@@ -58,6 +60,11 @@ const todosRouter = require('./routes/todos');
 const uploadRouter = require('./routes/upload');
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+cron.schedule('0 0 * * *', () => {
+  console.log('탈퇴한 지 3개월 지난 사용자 삭제 시작...');
+  deleteOldUsers();
+});
 
 app.get('/', (req, res) => {
   res.json({ msg: 'Index' });
