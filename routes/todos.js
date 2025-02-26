@@ -390,7 +390,7 @@ router.post("/statelodeed",isAuthenticated, controller.postTodoStateList);
  *                   type: object
  *                   nullable: true
  */
-router.post("/statelodeed",isAuthenticated, controller.postTodoStateList);
+router.post("/add",isAuthenticated, controller.postTodoCreate);
 
 /**
  * @swagger
