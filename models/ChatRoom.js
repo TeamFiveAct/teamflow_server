@@ -1,9 +1,9 @@
 // models/ChatRoom.js
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
 const ChatRoom = sequelize.define(
-  "ChatRoom",
+  'ChatRoom',
   {
     room_id: {
       type: DataTypes.BIGINT,
@@ -17,7 +17,7 @@ const ChatRoom = sequelize.define(
     },
   },
   {
-    tableName: "chat_rooms",
+    tableName: 'chat_rooms',
     timestamps: false,
   }
 );
