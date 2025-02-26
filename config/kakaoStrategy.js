@@ -21,8 +21,10 @@ passport.use(
           user = await User.create({
             auth_provider: 'kakao',
             kakao_id: profile.id,
+            nickname: Date.now().toString(36).toUpperCase() + 'kakao',
             access_token: accessToken,
             refresh_token: refreshToken,
+            profile_image: 'Mary Roebling',
           });
         } else {
           user.access_token = accessToken;
