@@ -161,7 +161,7 @@ exports.postTodoCreate = async (req, res) => {
       mem_id: spaceMember.mem_id
     });
 
-    res.send(responseUtil('SUCCESS', '업무생성 성공했습니다.', null));
+    res.send(responseUtil('SUCCESS', '업무생성 성공했습니다.', {todo}));
   } catch (error) {
     console.log('postTodoCreate Controller Err:', error);
     res.send(responseUtil('ERROR', '업무 생성에 실패하였습니다.', null));
