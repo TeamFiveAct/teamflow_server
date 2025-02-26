@@ -11,10 +11,9 @@ exports.postTodoList = async (req, res) => {
     const limit = 5;// 기본값 지정
     const statuses = ["plan", "progress", "done"];// 가져올 칸반보드 상태 목록
 
-
     // 조회요청하는 사용자가 워크스페이스 참여자인지 검증
     if (!await workSpaceUserVerification(spaceId, userId)) {
-      return res.status(404).send({
+      return res.status(403).send({
         status: "ERROR",
         message: "해당 워크스페이스의 권한이 없습니다",
         data: null,
@@ -38,7 +37,7 @@ exports.postTodoList = async (req, res) => {
     
     // 업무가 존재하지 않을경우
     if (!todoPromises || todoPromises.length === 0 || todoPromises.every(todos => todos.length === 0)) {
-      return res.send(responseUtil('SUCCESS', '조회할 업무가 없습니다.', null));
+      return res.status(404).send(responseUtil('SUCCESS', '조회할 업무가 없습니다.', null));
     }
     
     // 병렬로 모든 상태 데이터 가져오기
@@ -93,6 +92,7 @@ exports.postTodo = async (req, res) => {
   try {
     const spaceId = req.params.space_id;
     const todoId = req.params.todo_id;
+    const userId = req.session.passport?.user?.user_id;
 
     // 조회요청하는 사용자가 워크스페이스 참여자인지 검증
     if (!await workSpaceUserVerification(spaceId, userId)) {
