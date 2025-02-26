@@ -37,7 +37,7 @@ exports.postTodoList = async (req, res) => {
     
     // 업무가 존재하지 않을경우
     if (!todoPromises || todoPromises.length === 0 || todoPromises.every(todos => todos.length === 0)) {
-      return res.send(responseUtil('SUCCESS', '조회할 업무가 없습니다.', null));
+      return res.status(404).send(responseUtil('SUCCESS', '조회할 업무가 없습니다.', null));
     }
     
     // 병렬로 모든 상태 데이터 가져오기

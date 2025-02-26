@@ -111,6 +111,15 @@ Tag.belongsToMany(Todo, {
   onDelete: 'CASCADE',
 });
 
+Message.belongsTo(User, {
+  foreignKey: 'user_id',
+  as: 'user',
+  onDelete: 'CASCADE',
+});
+User.hasMany(Message, {
+  foreignKey: 'user_id',
+  as: 'messages',
+});
 // ─────────────────────────────────────────────────────────
 // 8) PasswordReset ↔ User (N:1)
 // ─────────────────────────────────────────────────────────
