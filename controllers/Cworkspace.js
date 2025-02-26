@@ -213,7 +213,8 @@ exports.getSpaceMember = async (req, res) => {
       attributes: ['user_id', 'nickname'],
     });
 
-    return res.send(responseUtil('SUCCESS', '전체 사용자 조회 성공', members.map((member) => ({space_id, ...member.dataValues}))));
+
+    return res.send(responseUtil('SUCCESS', '전체 사용자 조회 성공', members.map((member) => ({spaceId, ...member.dataValues}))));
   } catch (error) {
     console.log('postSpaceMember Controller Err:', error);
     res.send(responseUtil('ERROR', '전체 사용자 조회 실패', null));
