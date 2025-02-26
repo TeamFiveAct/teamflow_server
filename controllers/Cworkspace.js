@@ -213,8 +213,6 @@ exports.getSpaceMember = async (req, res) => {
       },
       attributes: ['user_id', 'nickname', 'profile_image'],
     });
-    
-
 
     return res.send(responseUtil('SUCCESS', '전체 사용자 조회 성공', members.map((member) => ({spaceId, ...member.dataValues}))));
   } catch (error) {
