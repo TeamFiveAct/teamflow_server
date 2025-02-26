@@ -930,7 +930,7 @@ router.patch('/restore/:todo_id', isAuthenticated, controller.restoreTodo);
  *     tags: [Todos]
  *     responses:
  *       200:
- *         description: 업무가 하드 삭제되었습니다.
+ *         description: 업무 상태가 변경되었습니다.
  *         content:
  *           application/json:
  *             schema:
@@ -941,11 +941,10 @@ router.patch('/restore/:todo_id', isAuthenticated, controller.restoreTodo);
  *                   example: "SUCCESS"
  *                 message:
  *                   type: string
- *                   example: "업무가 하드 삭제되었습니다."
+ *                   example: "업무 상태가 변경되었습니다."
  *                 data:
  *                   type: object
- *                   nullable: true
- *                   example: null
+ *                   example: {}
  *       400:
  *         description: Bad Request
  *         content:
@@ -1011,6 +1010,7 @@ router.patch('/restore/:todo_id', isAuthenticated, controller.restoreTodo);
  *                   type: object
  *                   nullable: true
  */
+
 router.patch('/state/:todo_id', isAuthenticated, controller.patchTodoState);
 
 // // 전체 업무 리스트 조회

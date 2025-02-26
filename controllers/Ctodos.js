@@ -13,8 +13,8 @@ exports.postTodoList = async (req, res) => {
 
     // 조회요청하는 사용자가 워크스페이스 참여자인지 검증
     if (!await workSpaceUserVerification(spaceId, userId)) {
-      return res.status(403).send({
-        status: "ERROR",
+      return res.send({
+        status: "SUCCESS",
         message: "해당 워크스페이스의 권한이 없습니다",
         data: null,
       });
@@ -64,8 +64,8 @@ exports.postTodoStateList = async (req,res)=>{
 
     // 조회요청하는 사용자가 워크스페이스 참여자인지 검증
     if (!await workSpaceUserVerification(spaceId, userId)) {
-      return res.status(404).send({
-        status: "ERROR",
+      return res.send({
+        status: "SUCCESS",
         message: "해당 워크스페이스의 권한이 없습니다",
         data: null,
       });
@@ -96,8 +96,8 @@ exports.postTodo = async (req, res) => {
 
     // 조회요청하는 사용자가 워크스페이스 참여자인지 검증
     if (!await workSpaceUserVerification(spaceId, userId)) {
-      return res.status(404).send({
-        status: "ERROR",
+      return res.send({
+        status: "SUCCESS",
         message: "해당 워크스페이스의 권한이 없습니다",
         data: null,
       });
@@ -130,8 +130,8 @@ exports.postTodoCreate = async (req, res) => {
 
     // 요청하는 사용자가 워크스페이스 참여자인지 검증
     if (!await workSpaceUserVerification(spaceId, userId)) {
-      return res.status(404).send({
-        status: "ERROR",
+      return res.send({
+        status: "SUCCESS",
         message: "해당 워크스페이스의 권한이 없습니다",
         data: null,
       });
@@ -178,8 +178,8 @@ exports.patchTodo = async (req, res) => {
 
     // 요청하는 사용자가 워크스페이스 참여자인지 검증
     if (!await workSpaceUserVerification(spaceId, userId)) {
-      return res.status(404).send({
-        status: "ERROR",
+      return res.send({
+        status: "SUCCESS",
         message: "해당 워크스페이스의 권한이 없습니다",
         data: null,
       });
@@ -212,8 +212,8 @@ exports.deleteTodo = async (req, res) => {
 
     // 요청하는 사용자가 워크스페이스 참여자인지 검증
     if (!await workSpaceUserVerification(spaceId, userId)) {
-      return res.status(404).send({
-        status: "ERROR",
+      return res.send({
+        status: "SUCCESS",
         message: "해당 워크스페이스의 권한이 없습니다",
         data: null,
       });
@@ -223,8 +223,8 @@ exports.deleteTodo = async (req, res) => {
     const todo = await todoModel.findByPk(todoId);
 
     if (!todo) {
-      return res.status(404).send({
-        status: "ERROR",
+      return res.send({
+        status: "SUCCESS",
         message: "해당 업무를 찾을 수 없습니다.",
         data: null,
       });
@@ -251,8 +251,8 @@ exports.postSoftDelList = async (req, res) => {
 
     // 요청하는 사용자가 워크스페이스 참여자인지 검증
     if (!await workSpaceUserVerification(spaceId, userId)) {
-      return res.status(404).send({
-        status: "ERROR",
+      return res.send({
+        status: "SUCCESS",
         message: "해당 워크스페이스의 권한이 없습니다",
         data: null,
       });
@@ -281,8 +281,8 @@ exports.deleteHardDeleteTodo = async (req, res) => {
 
     // 요청하는 사용자가 워크스페이스 참여자인지 검증
     if (!await workSpaceUserVerification(spaceId, userId)) {
-      return res.status(404).send({
-        status: "ERROR",
+      return res.send({
+        status: "SUCCESS",
         message: "해당 워크스페이스의 권한이 없습니다",
         data: null,
       });
@@ -298,8 +298,8 @@ exports.deleteHardDeleteTodo = async (req, res) => {
     });
 
     if (!todo) {
-      return res.status(404).send({
-        status: "ERROR",
+      return res.send({
+        status: "SUCCESS",
         message: "삭제된 업무가 존재하지않습니다",
         data: null,
       });
@@ -324,8 +324,8 @@ exports.restoreTodo = async (req, res) => {
 
     // 요청하는 사용자가 워크스페이스 참여자인지 검증
     if (!await workSpaceUserVerification(spaceId, userId)) {
-      return res.status(404).send({
-        status: "ERROR",
+      return res.send({
+        status: "SUCCESS",
         message: "해당 워크스페이스의 권한이 없습니다",
         data: null,
       });
@@ -361,8 +361,8 @@ exports.patchTodoState = async (req, res) => {
 
     // 요청하는 사용자가 워크스페이스 참여자인지 검증
     if (!await workSpaceUserVerification(spaceId, userId)) {
-      return res.status(404).send({
-        status: "ERROR",
+      return res.send({
+        status: "SUCCESS",
         message: "해당 워크스페이스의 권한이 없습니다",
         data: null,
       });
@@ -371,7 +371,7 @@ exports.patchTodoState = async (req, res) => {
     // 해당 업무 찾기
     const todo = await todoModel.findByPk(todoId);
     if (!todo) {
-      return res.send(responseUtil('ERROR', '수정할 업무를 찾을 수 없습니다.', null));
+      return res.send(responseUtil('SUCCESS', '수정할 업무를 찾을 수 없습니다.', null));
     }
 
     // 상태 업데이트
