@@ -6,225 +6,1011 @@ const isAuthenticated = require('../middlewares/isAuthenticated'); // 로그인 
 // todos 라우터의 기본 URL은 todos/ 입니다!!!
 /* 컨트롤러의 이름은 임의로 설정하였으니 각각 용도에 맞춰 작성해주세요~ 😀 */
 
+
 /**
  * @swagger
  * tags:
  *   name: Todos
- *   description: 업무 관련 API (수정진행중!!!)
+ *   description: 워크스페이스 업무 관련 API
  */
 
 /**
  * @swagger
- * /todos:
+ * /v1/workspace/{space_id}/todos:
  *   post:
  *     summary: 전체 업무 리스트 조회
  *     tags: [Todos]
  *     responses:
  *       200:
- *         description: 성공적으로 전체 업무 리스트를 반환함
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: integer
- *                     example: 1
- *                   title:
- *                     type: string
- *                     example: "업무 제목"
- *                   description:
- *                     type: string
- *                     example: "업무 설명"
- */
-router.post('/', isAuthenticated, controller.postTodoList);
-
-
-
-router.post("/statelodeed",isAuthenticated, controller.postTodoStateList);
-
-
-
-/**
- * @swagger
- * /todos/add:
- *   post:
- *     summary: 업무 생성
- *     tags: [Todos]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               title:
- *                 type: string
- *                 example: "새로운 업무"
- *               description:
- *                 type: string
- *                 example: "업무 상세 내용"
- *     responses:
- *       201:
- *         description: 업무가 성공적으로 생성됨
- */
-router.post('/add', isAuthenticated, controller.postTodoCreate);
-
-/**
- * @swagger
- * /todos/view/{todo_id}:
- *   post:
- *     summary: 특정 업무 조회
- *     tags: [Todos]
- *     parameters:
- *       - in: path
- *         name: todo_id
- *         required: true
- *         schema:
- *           type: integer
- *         description: 조회할 업무 ID
- *     responses:
- *       200:
- *         description: 특정 업무 정보를 반환함
+ *         description: 전체 업무 목록을 가져옴
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 id:
- *                   type: integer
- *                   example: 1
- *                 title:
+ *                 status:
  *                   type: string
- *                   example: "업무 제목"
- *                 description:
+ *                   example: "SUCCESS"
+ *                 message:
  *                   type: string
- *                   example: "업무 설명"
+ *                   example: "전체업무 목록을 가져왔습니다."
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     plan:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/Todo'
+ *                     progress:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/Todo'
+ *                     done:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/Todo'
+ *       400:
+ *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "요청값이 올바르지않습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "로그인되지 않은 사용자입니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       403:
+ *         description: Forbidden
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "접근 권한이 없습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true 
+ *       503:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류가 발생했습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *
+ * components:
+ *   schemas:
+ *     Todo:
+ *       type: object
+ *       properties:
+ *         todo_id:
+ *           type: integer
+ *           example: 3
+ *         space_id:
+ *           type: integer
+ *           example: 1
+ *         title:
+ *           type: string
+ *           example: "explicabo conor terreo"
+ *         description:
+ *           type: string
+ *           example: "Praesentium facere tonsor curto recusandae aut adiuvo. Spes appello volutabrum."
+ *         priority:
+ *           type: string
+ *           enum: [low, medium, high]
+ *           example: "low"
+ *         start_date:
+ *           type: string
+ *           format: date
+ *           example: "2025-02-03"
+ *         due_date:
+ *           type: string
+ *           format: date
+ *           example: "2025-10-11"
+ *         status:
+ *           type: string
+ *           enum: [plan, progress, done]
+ *           example: "plan"
+ *         created_at:
+ *           type: string
+ *           format: date-time
+ *           example: "2025-02-26T01:24:56.000Z"
+ *         is_deleted:
+ *           type: boolean
+ *           example: false
+ *         deleted_at:
+ *           type: string
+ *           format: date-time
+ *           nullable: true
+ *           example: null
  */
+router.post('/', isAuthenticated, controller.postTodoList);
+
+/**
+ * @swagger
+ * /v1/workspace/{space_id}/todos/statelodeed:
+ *   post:
+ *     summary: 업무 무한스크롤 조회
+ *     tags: [Todos]
+ *     responses:
+ *       200:
+ *         description: 업무 목록을 가져왔습니다.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "SUCCESS"
+ *                 message:
+ *                   type: string
+ *                   example: "업무 목록을 가져왔습니다."
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     plan:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           todo_id:
+ *                             type: integer
+ *                             example: 1
+ *                           space_id:
+ *                             type: integer
+ *                             example: 1
+ *                           title:
+ *                             type: string
+ *                             example: "Todo 1 for Workspace 1"
+ *                           description:
+ *                             type: string
+ *                             example: "Dummy todo description"
+ *                           priority:
+ *                             type: string
+ *                             example: "low"
+ *                           start_date:
+ *                             type: string
+ *                             format: date
+ *                             example: "2025-02-21"
+ *                           due_date:
+ *                             type: string
+ *                             format: date
+ *                             example: "2025-02-28"
+ *                           status:
+ *                             type: string
+ *                             example: "plan"
+ *                           created_at:
+ *                             type: string
+ *                             format: date-time
+ *                             example: "2025-02-21T09:19:59.000Z"
+ *                           is_deleted:
+ *                             type: boolean
+ *                             example: false
+ *                           deleted_at:
+ *                             type: string
+ *                             nullable: true
+ *                             example: null
+ *                     progress:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                     done:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *       400:
+ *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "요청값이 올바르지않습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "로그인되지 않은 사용자입니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       403:
+ *         description: Forbidden
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "접근 권한이 없습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       503:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류가 발생했습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ */
+router.post("/statelodeed",isAuthenticated, controller.postTodoStateList);
+
+/**
+ * @swagger
+ * /v1/workspace/{space_id}/todos/add:
+ *   post:
+ *     summary: 업무생성
+ *     tags: [Todos]
+ *     responses:
+ *       200:
+ *         description: 업무생성 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "SUCCESS"
+ *                 message:
+ *                   type: string
+ *                   example: "업무를 생성했습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       400:
+ *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "요청값이 올바르지않습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "로그인되지 않은 사용자입니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       403:
+ *         description: Forbidden
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "접근 권한이 없습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       503:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류가 발생했습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ */
+router.post("/statelodeed",isAuthenticated, controller.postTodoStateList);
+
+/**
+ * @swagger
+ * /v1/workspace/{space_id}/todos/view/{todo_id}:
+ *   post:
+ *     summary: 업무 상세 조회
+ *     tags: [Todos]
+ *     responses:
+ *       200:
+ *         description: 업무 조회성공에 성공했습니다.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "SUCCESS"
+ *                 message:
+ *                   type: string
+ *                   example: "업무 조회성공에 성공했습니다."
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     todo_id:
+ *                       type: integer
+ *                       example: 1
+ *                     space_id:
+ *                       type: integer
+ *                       example: 1
+ *                     title:
+ *                       type: string
+ *                       example: "vulpes expedita abstergo"
+ *                     description:
+ *                       type: string
+ *                       example: "Canto fugit aufero succedo angustus astrum. Urbanus rem contabesco."
+ *                     priority:
+ *                       type: string
+ *                       example: "high"
+ *                     start_date:
+ *                       type: string
+ *                       format: date
+ *                       example: "2024-03-13"
+ *                     due_date:
+ *                       type: string
+ *                       format: date
+ *                       example: "2025-06-13"
+ *                     status:
+ *                       type: string
+ *                       example: "done"
+ *                     created_at:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2025-02-26T01:24:56.000Z"
+ *                     is_deleted:
+ *                       type: boolean
+ *                       example: false
+ *                     deleted_at:
+ *                       type: string
+ *                       nullable: true
+ *                       example: null
+ *       400:
+ *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "요청값이 올바르지않습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "로그인되지 않은 사용자입니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       403:
+ *         description: Forbidden
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "접근 권한이 없습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       503:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류가 발생했습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ */
+
 router.post('/view/:todo_id', isAuthenticated, controller.postTodo);
 
 /**
  * @swagger
- * /todos/{todo_id}:
+ * /v1/workspace/{space_id}/todos/{todo_id}:
  *   patch:
- *     summary: 업무 수정
+ *     summary: 업무수정
  *     tags: [Todos]
- *     parameters:
- *       - in: path
- *         name: todo_id
- *         required: true
- *         schema:
- *           type: integer
- *         description: 수정할 업무 ID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               title:
- *                 type: string
- *                 example: "수정된 업무 제목"
- *               description:
- *                 type: string
- *                 example: "수정된 업무 설명"
  *     responses:
  *       200:
- *         description: 업무가 성공적으로 수정됨
+ *         description: 업무 수정 성공했습니다.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "SUCCESS"
+ *                 message:
+ *                   type: string
+ *                   example: "업무 수정 성공했습니다."
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     todo_id:
+ *                       type: integer
+ *                       example: 1
+ *                     space_id:
+ *                       type: integer
+ *                       example: 1
+ *                     title:
+ *                       type: string
+ *                       example: "업무"
+ *                     description:
+ *                       type: string
+ *                       example: "업무 설명22"
+ *                     priority:
+ *                       type: string
+ *                       example: "low"
+ *                     start_date:
+ *                       type: string
+ *                       format: date
+ *                       example: "2022-02-01"
+ *                     due_date:
+ *                       type: string
+ *                       format: date
+ *                       example: "2022-02-05"
+ *                     status:
+ *                       type: string
+ *                       example: "done"
+ *                     created_at:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2025-02-26T01:24:56.000Z"
+ *                     is_deleted:
+ *                       type: boolean
+ *                       example: false
+ *                     deleted_at:
+ *                       type: string
+ *                       nullable: true
+ *                       example: null
+ *       400:
+ *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "요청값이 올바르지않습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "로그인되지 않은 사용자입니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       403:
+ *         description: Forbidden
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "접근 권한이 없습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       503:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류가 발생했습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
  */
+
 router.patch('/:todo_id', isAuthenticated, controller.patchTodo);
 
 /**
  * @swagger
- * /todos/{todo_id}:
+ * /v1/workspace/{space_id}/todos/{todo_id}:
  *   delete:
- *     summary: 업무 소프트 삭제
+ *     summary: 업무삭제(소프트딜리트)
  *     tags: [Todos]
- *     parameters:
- *       - in: path
- *         name: todo_id
- *         required: true
- *         schema:
- *           type: integer
- *         description: 삭제할 업무 ID
  *     responses:
  *       200:
- *         description: 업무가 성공적으로 소프트 삭제됨
+ *         description: 업무가 소프트 삭제되었습니다.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "SUCCESS"
+ *                 message:
+ *                   type: string
+ *                   example: "업무가 소프트 삭제되었습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *                   example: null
+ *       400:
+ *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "요청값이 올바르지않습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "로그인되지 않은 사용자입니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       403:
+ *         description: Forbidden
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "접근 권한이 없습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       503:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류가 발생했습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
  */
 router.delete('/:todo_id', isAuthenticated, controller.deleteTodo);
 
 /**
  * @swagger
- * /todos/permanent/{todo_id}:
+ * /v1/workspace/{space_id}/todos/permanent/{todo_id}:
  *   delete:
- *     summary: 업무 하드 삭제
+ *     summary: 업무삭제(하드딜리트)
  *     tags: [Todos]
- *     parameters:
- *       - in: path
- *         name: todo_id
- *         required: true
- *         schema:
- *           type: integer
- *         description: 영구 삭제할 업무 ID
  *     responses:
  *       200:
- *         description: 업무가 성공적으로 영구 삭제됨
+ *         description: 업무가 하드 삭제되었습니다.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "SUCCESS"
+ *                 message:
+ *                   type: string
+ *                   example: "업무가 하드 삭제되었습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *                   example: null
+ *       400:
+ *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "요청값이 올바르지않습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "로그인되지 않은 사용자입니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       403:
+ *         description: Forbidden
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "접근 권한이 없습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       503:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류가 발생했습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
  */
-router.delete(
-  '/permanent/:todo_id',
-  isAuthenticated,
-  controller.deleteHardDeleteTodo
-);
+
+router.delete('/permanent/:todo_id',isAuthenticated,controller.deleteHardDeleteTodo);
 
 /**
  * @swagger
- * /todos/restore/{todo_id}:
+ * /v1/workspace/{space_id}/todos/restore/{todo_id}:
  *   patch:
- *     summary: 소프트 삭제된 업무 복구
+ *     summary: 삭제된 업무 복원
  *     tags: [Todos]
- *     parameters:
- *       - in: path
- *         name: todo_id
- *         required: true
- *         schema:
- *           type: integer
- *         description: 복구할 업무 ID
  *     responses:
  *       200:
- *         description: 업무가 성공적으로 복구됨
+ *         description: 업무가 복구되었습니다.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "SUCCESS"
+ *                 message:
+ *                   type: string
+ *                   example: "업무가 복구되었습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *                   example: null
+ *       400:
+ *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "요청값이 올바르지않습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "로그인되지 않은 사용자입니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       403:
+ *         description: Forbidden
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "접근 권한이 없습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       503:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류가 발생했습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
  */
 router.patch('/restore/:todo_id', isAuthenticated, controller.restoreTodo);
 
 /**
  * @swagger
- * /todos/state/{todo_id}:
+ * /v1/workspace/{space_id}/todos/state/{todo_id}:
  *   patch:
- *     summary: 업무 상태 변경
+ *     summary: 업무 상태변경
  *     tags: [Todos]
- *     parameters:
- *       - in: path
- *         name: todo_id
- *         required: true
- *         schema:
- *           type: integer
- *         description: 상태를 변경할 업무 ID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               state:
- *                 type: string
- *                 example: "완료"
  *     responses:
  *       200:
- *         description: 업무 상태가 성공적으로 변경됨
+ *         description: 업무 상태가 변경되었습니다.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "SUCCESS"
+ *                 message:
+ *                   type: string
+ *                   example: "업무 상태가 변경되었습니다."
+ *                 data:
+ *                   type: object
+ *                   example: {}
+ *       400:
+ *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "요청값이 올바르지않습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "로그인되지 않은 사용자입니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       403:
+ *         description: Forbidden
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "접근 권한이 없습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *       503:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 message:
+ *                   type: string
+ *                   example: "서버 오류가 발생했습니다."
+ *                 data:
+ *                   type: object
+ *                   nullable: true
  */
+
 router.patch('/state/:todo_id', isAuthenticated, controller.patchTodoState);
 
 // // 전체 업무 리스트 조회
