@@ -1,9 +1,9 @@
 // models/Workspace.js
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database"); // 경로 수정
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database'); // 경로 수정
 
 const Workspace = sequelize.define(
-  "Workspace",
+  'Workspace',
   {
     space_id: {
       type: DataTypes.BIGINT,
@@ -33,7 +33,7 @@ const Workspace = sequelize.define(
     },
   },
   {
-    tableName: "workspaces",
+    tableName: 'workspaces',
     timestamps: false,
   }
 );
