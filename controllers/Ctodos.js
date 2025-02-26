@@ -87,7 +87,7 @@ exports.postTodoStateList = async (req,res)=>{
   }
 }
 
-// 특정 업무 조회
+//업무 상세 조회
 exports.postTodo = async (req, res) => {
   try {
     const spaceId = req.params.space_id;
@@ -112,7 +112,7 @@ exports.postTodo = async (req, res) => {
     });
 
     res.send(
-      responseUtil('SUCCESS', '특정업무 조회성공에 성공했습니다.', {
+      responseUtil('SUCCESS', '업무 조회성공에 성공했습니다.', {
         ...todo.dataValues,
       })
     );
@@ -354,6 +354,7 @@ exports.restoreTodo = async (req, res) => {
 // 업무 상태수정
 exports.patchTodoState = async (req, res) => {
   try {
+    const spaceId = req.params.space_id;
     const todoId = req.params.todo_id;
     const userId = req.session.passport?.user?.user_id;
     const { state } = req.body; // 변경할 상태 값
