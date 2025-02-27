@@ -35,16 +35,42 @@ class PasswordController {
       req.body.to = email;
       req.body.subject = '[TeamFlow] 비밀번호 재설정 요청';
       req.body.html = `
-                <h2>비밀번호 재설정 요청</h2>
-                <p>안녕하세요,</p>
-                <p>비밀번호 재설정을 요청하셨습니다. 아래 링크를 클릭하여 새로운 비밀번호를 설정해주세요:</p>
-                <p><a href="${resetLink}">${resetLink}</a></p>
-                <p>이 링크는 30분 동안만 유효합니다.</p>
-                <p>비밀번호 재설정을 요청하지 않으셨다면 이 이메일을 무시하시면 됩니다.</p>
-                <br>
-                <p>감사합니다.</p>
-                <p>TeamFlow 팀</p>
-            `;
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>비밀번호 재설정 요청</title>
+      </head>
+      <body style="margin:0; padding:0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+        <table align="center" width="600" style="border-collapse: collapse; background-color: #ffffff; margin-top: 30px; border-radius: 8px; overflow: hidden;">
+          <tr>
+            <td style="background-color: #1a73e8; padding: 20px; text-align: center; color: #ffffff;">
+              <h1 style="margin: 0; font-size: 24px;">TeamFlow</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 30px;">
+              <h2 style="color: #333333;">비밀번호 재설정 요청</h2>
+              <p style="color: #555555;">안녕하세요,</p>
+              <p style="color: #555555;">귀하의 계정 비밀번호 재설정 요청을 확인하였습니다. 아래 버튼을 클릭하여 새로운 비밀번호를 설정해 주세요. 이 링크는 30분 동안만 유효합니다.</p>
+              <div style="text-align: center; margin: 40px 0;">
+                <a href="${resetLink}" style="background-color: #1a73e8; color: #ffffff; text-decoration: none; padding: 15px 30px; border-radius: 4px; font-size: 16px;">비밀번호 재설정</a>
+              </div>
+              <p style="color: #555555;">만약 이 요청을 본인이 한 것이 아니라면, 이 이메일을 무시해 주세요.</p>
+              <p style="color: #555555;">감사합니다.</p>
+              <p style="color: #555555;">TeamFlow 팀 드림</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color: #f4f4f4; padding: 20px; text-align: center; color: #aaaaaa; font-size: 12px;">
+              <p style="margin: 0;">이메일 수신에 문제가 있으시면 고객 지원에 문의해 주세요.</p>
+            </td>
+          </tr>
+        </table>
+      </body>
+      </html>
+    `;
+    
 
       // 이메일 미들웨어를 사용해 이메일 전송 (Promise로 래핑하여 대기)
       await new Promise((resolve, reject) => {
