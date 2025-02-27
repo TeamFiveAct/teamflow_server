@@ -322,7 +322,7 @@ exports.postSpaceInvite = async (req, res, next) => {
     const spaceId = req.params.space_id;
     const { email } = req.body;
 
-    if (!email || !space_id)
+    if (!email || !spaceId)
       return res.send(
         responseUtil('ERROR', '이메일과 워크스페이스 ID가 필요합니다.', null)
       );
@@ -330,7 +330,7 @@ exports.postSpaceInvite = async (req, res, next) => {
     // 예제 초대 코드 (실제 서비스에서는 DB에서 가져오거나 생성해야 함)
     const workSpace = await workSpaceModel.findOne({
       where: {
-        space_id: space_id,
+        space_id: spaceId,
       },
       attributes: ['space_password', 'space_title'],
     });
