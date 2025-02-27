@@ -71,11 +71,9 @@ exports.postTodoStateList = async (req,res)=>{
         data: null,
       });
     }
-      
       // 조회 기본값 설정
       const taskLimit = parseInt(limit) || 5;
       const taskOffset = parseInt(offset) || 0;
-      
       const tasks = await todoModel.findAll({
         where: { space_id:spaceId, status:state }, // 상태 필터링
         order: [["created_at", "ASC"]], // 생성일 기준 정렬
@@ -232,6 +230,7 @@ exports.postTodoCreate = async (req, res) => {
       space_id: req.params.space_id,
       title: req.body.title,
       description: req.body.description,
+      status: req.body.status,
       priority: req.body.priority,
       start_date: req.body.start_date,
       due_date: req.body.due_date,
