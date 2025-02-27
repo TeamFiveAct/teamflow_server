@@ -1013,6 +1013,11 @@ router.patch('/restore/:todo_id', isAuthenticated, controller.restoreTodo);
 
 router.patch('/state/:todo_id', isAuthenticated, controller.patchTodoState);
 
+
+
+// 필터링
+router.get('/filter', isAuthenticated, controller.getTodoStateFilterList);
+
 // // 전체 업무 리스트 조회
 // router.post("/", isAuthenticated, controller.postTodoList);
 // // 업무 생성
