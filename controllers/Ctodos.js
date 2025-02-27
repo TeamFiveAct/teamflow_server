@@ -71,7 +71,6 @@ exports.postTodoStateList = async (req,res)=>{
         data: null,
       });
     }
-      
       // 조회 기본값 설정
       const taskLimit = parseInt(limit) || 5;
       const taskOffset = parseInt(offset) || 0;
@@ -232,6 +231,7 @@ exports.postTodoCreate = async (req, res) => {
       space_id: req.params.space_id,
       title: req.body.title,
       description: req.body.description,
+      status: req.body.status,
       priority: req.body.priority,
       start_date: req.body.start_date,
       due_date: req.body.due_date,
