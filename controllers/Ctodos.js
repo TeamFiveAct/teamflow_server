@@ -2,6 +2,7 @@ const todoModel = require("../models/Todo");
 const workerModel = require("../models/Worker");
 const workSpaceMemberModel = require("../models/WorkspaceMember");
 const responseUtil = require('../utils/ResponseUtil');
+const Sequelize = require('sequelize'); // Sequelize 모듈 가져오기
 
 // 전체 업무 리스트
 exports.postTodoList = async (req, res) => {
@@ -74,6 +75,7 @@ exports.postTodoStateList = async (req,res)=>{
       // 조회 기본값 설정
       const taskLimit = parseInt(limit) || 5;
       const taskOffset = parseInt(offset) || 0;
+      
       const tasks = await todoModel.findAll({
         where: { space_id:spaceId, status:state }, // 상태 필터링
         order: [["created_at", "ASC"]], // 생성일 기준 정렬
@@ -86,6 +88,94 @@ exports.postTodoStateList = async (req,res)=>{
     res.send(responseUtil('ERROR', '전체 업무조회에 실패하였습니다.', null));
   }
 }
+
+// 특정 상태 업무 필터링 조회
+exports.getTodoStateFilterList = async (req, res) => {
+  try {
+    const spaceId = req.params.space_id;
+    const userId = req.session.passport?.user?.user_id;
+    const { state, priority, date_order, limit, offset } = req.query;
+
+    // 조회 요청하는 사용자가 워크스페이스 참여자인지 검증
+    if (!await workSpaceUserVerification(spaceId, userId)) {
+      return res.send({
+        status: "SUCCESS",
+        message: "해당 워크스페이스의 권한이 없습니다",
+        data: null,
+      });
+    }
+
+    // 조회 기본값 설정
+    const taskLimit = parseInt(limit) || 5;
+    const taskOffset = parseInt(offset) || 0;
+
+    // 필터링 조건 설정
+    let filterConditions = { space_id: spaceId };
+    let orderConditions = [];
+
+    // 상태 필터
+    if (state) {
+      filterConditions.status = state;
+
+      // 선택한 상태를 우선 정렬하는 CASE WHEN
+      const statusCase = `
+        CASE 
+          WHEN status = '${state}' THEN 1
+          WHEN status = 'plan' THEN 2
+          WHEN status = 'progress' THEN 3
+          WHEN status = 'done' THEN 4
+          ELSE 5
+        END
+      `;
+      orderConditions.push([Sequelize.literal(statusCase), "ASC"]);
+    }
+
+    // 우선순위 정렬 (priority가 선택되었을 경우)
+    if (priority) {
+      const priorityCase = `
+        CASE 
+          WHEN priority = '${priority}' THEN 1
+          WHEN priority = 'high' THEN 2
+          WHEN priority = 'medium' THEN 3
+          WHEN priority = 'low' THEN 4
+          ELSE 5
+        END
+      `;
+      orderConditions.push([Sequelize.literal(priorityCase), "ASC"]);
+    }
+
+    // 날짜 정렬 (date_order: 'ASC' 또는 'DESC'로 지정)
+    if (date_order) {
+      if (date_order.toUpperCase() === "ASC") {
+        orderConditions.push(["start_date", "ASC"]); // 시작일 기준 오름차순
+      } else if (date_order.toUpperCase() === "DESC") {
+        orderConditions.push(["due_date", "DESC"]); // 마감일 기준 내림차순
+      }
+    }
+
+    // 기본 정렬 추가 (정렬 기준이 없을 때)
+    if (orderConditions.length === 0) {
+      orderConditions.push(["created_at", "ASC"]);
+    }
+
+    // 디버깅용 콘솔 로그
+    console.log("WHERE:", filterConditions);
+    console.log("ORDER:", orderConditions);
+
+    // DB 조회
+    const tasks = await todoModel.findAll({
+      where: filterConditions,
+      order: orderConditions,
+      limit: taskLimit, // 개수 제한
+      offset: taskOffset // 시작 위치 설정
+    });
+
+    res.send(responseUtil("SUCCESS", "필터링된 업무 목록을 가져왔습니다.", tasks));
+  } catch (error) {
+    console.log("getFilteredTodos Controller Err:", error);
+    res.send(responseUtil("ERROR", "필터링된 업무 목록을 가져오는데 실패했습니다.", null));
+  }
+};
 
 //업무 상세 조회
 exports.postTodo = async (req, res) => {
