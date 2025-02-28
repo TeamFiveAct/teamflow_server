@@ -392,6 +392,9 @@ router.post("/statelodeed",isAuthenticated, controller.postTodoStateList);
  */
 router.post("/add",isAuthenticated, controller.postTodoCreate);
 
+// 긴급추가 소프트 딜리트리스트
+router.post('/deletelist', isAuthenticated, controller.postSoftDelList);
+
 /**
  * @swagger
  * /v1/workspace/{space_id}/todos/view/{todo_id}:
@@ -739,6 +742,9 @@ router.patch('/:todo_id', isAuthenticated, controller.patchTodo);
  */
 router.delete('/:todo_id', isAuthenticated, controller.deleteTodo);
 
+
+
+
 /**
  * @swagger
  * /v1/workspace/{space_id}/todos/permanent/{todo_id}:
@@ -1012,6 +1018,9 @@ router.patch('/restore/:todo_id', isAuthenticated, controller.restoreTodo);
  */
 
 router.patch('/state/:todo_id', isAuthenticated, controller.patchTodoState);
+
+
+
 
 
 
