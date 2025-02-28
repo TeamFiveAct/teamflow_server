@@ -76,7 +76,7 @@ exports.postTodoStateList = async (req,res)=>{
       const taskOffset = parseInt(offset) || 0;
       
       const tasks = await todoModel.findAll({
-        where: { space_id:spaceId, status:state }, // 상태 필터링
+        where: { space_id:spaceId, status:state, is_deleted: false }, // 상태 필터링
         order: [["created_at", "ASC"]], // 생성일 기준 정렬
         limit: taskLimit, // 개수 제한
         offset: taskOffset // 시작 위치 설정
