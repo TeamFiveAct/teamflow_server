@@ -352,7 +352,7 @@ exports.postSoftDelList = async (req, res) => {
     await todoModel.findAll({
       where:{
         space_id:spaceId,
-        user_id:userId
+        is_deleted: true
       }
     });
     res.send(responseUtil('SUCCESS', '업무가 성공적으로 불러왔습니다', null));
