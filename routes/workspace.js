@@ -92,7 +92,7 @@ router.get('/user', isAuthenticated, controller.getMySpace);
  *       200:
  *         description: 초대가 성공적으로 전송됨
  */
-router.post('/invite', isAuthenticated, controller.postSpaceInvite);
+router.post('/:space_id/invite', isAuthenticated, controller.postSpaceInvite);
 
 /**
  * @swagger
