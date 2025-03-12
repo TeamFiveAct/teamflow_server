@@ -14,14 +14,14 @@ const TodoTags = require('./TodoTags');
 const PasswordReset = require('./PasswordReset'); // PasswordReset 모델 연결
 
 // members : users = N : 1
-WorkspaceMember.belongsTo(User, {
+User.hasOne(Workspace, {
   foreignKey: 'user_id',
   as: 'workspaces',
   onDelete: 'CASCADE',
 });
-User.hasMany(WorkspaceMember, {
-  foreignKey: 'user_id',
-  as: 'workspace_member',
+Workspace.belongsTo(User, {
+  as: 'users',
+  onDelete: 'CASCADE',
 });
 
 // ─────────────────────────────────────────────────────────
