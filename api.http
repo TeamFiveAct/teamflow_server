@@ -1,0 +1,11 @@
+@server = http://localhost:8000
+
+### Todo 추가 (case1. 요청 본문에 title, done 필드 모두 작성하는 경우)
+POST {{server}}/v1/user/join
+Content-Type: application/json; charset=UTF-8
+
+{
+  "email" : "test123@test.com",
+  "password_hash" : "qwer1234",
+  "nickname": "이수댕댕댕"
+}
