@@ -366,7 +366,7 @@ exports.postSpaceInvite = async (req, res, next) => {
     
           <!-- 이동 버튼 -->
           <p style="text-align: center;">
-            <a href="https://your-workspace-url.com"
+            <a href="https://teamflow.reves.kr"
                style="display: inline-block; padding: 12px 24px; background-color: #007bff; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; margin: 0 auto;">
               워크스페이스로 이동
             </a>
